@@ -11,9 +11,15 @@ app.use("/api/movies", movieRoutes);
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
-    res.json({
+    return res.json({
         status: "OK",
         message: "OTT Backend API is running",
+    });
+});
+
+app.use((req, res) => {
+    return res.status(404).json({
+        message: "Route not found",
     });
 });
 

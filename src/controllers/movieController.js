@@ -7,7 +7,7 @@ const createMovie = async (req, res) => {
         res.status(201).json(movie);
     } catch (error) {
         res.status(500).json({
-            message: error.message
+            message: error.message,
         });
     }
 };
@@ -19,7 +19,7 @@ const getAllMovies = async (req, res) => {
         res.status(200).json(movies);
     } catch (error) {
         res.status(500).json({
-            message: error.message
+            message: error.message,
         });
     }
 };
@@ -48,26 +48,21 @@ const updateMovie = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const updatedMovie = await Movie.findByIdAndUpdate(
-            id,
-            req.body,
-            {
-                new: true,
-                runValidators: true
-            }
-        );
+        const updatedMovie = await Movie.findByIdAndUpdate(id, req.body, {
+            new: true,
+            runValidators: true,
+        });
 
         if (!updatedMovie) {
             return res.status(404).json({
-                message: "Movie not found"
+                message: "Movie not found",
             });
         }
 
         res.status(200).json(updatedMovie);
-
     } catch (error) {
         res.status(500).json({
-            message: error.message
+            message: error.message,
         });
     }
 };
@@ -80,17 +75,16 @@ const deleteMovie = async (req, res) => {
 
         if (!deletedMovie) {
             return res.status(404).json({
-                message: "Movie not found"
+                message: "Movie not found",
             });
         }
 
         res.status(200).json({
-            message: "Movie deleted successfully"
+            message: "Movie deleted successfully",
         });
-
     } catch (error) {
         res.status(500).json({
-            message: error.message
+            message: error.message,
         });
     }
 };
@@ -100,5 +94,5 @@ module.exports = {
     getAllMovies,
     getMovieById,
     updateMovie,
-    deleteMovie
+    deleteMovie,
 };
