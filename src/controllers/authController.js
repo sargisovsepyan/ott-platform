@@ -85,7 +85,7 @@ const login = async (req, res) => {
             });
         }
 
-        const token = generateToken(user._id);
+        const token = generateToken(user._id, user.role);
 
         return res.status(200).json({
             message: "Login successful",
