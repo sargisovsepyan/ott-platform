@@ -8,15 +8,15 @@ const createMovie = asyncHandler(async (req, res) => {
     res.status(201).json(movie);
 });
 
-// Возвращает массив фильмов с учетом поиска и фильтрации.
+// Возвращает массив фильмов с учетом поиска, фильтрации и сортировки.
 const getAllMovies = asyncHandler(async (req, res) => {
     // Получаем параметры из URL.
-    const { search, year, genre } = req.query;
+    const { search, year, genre, sort } = req.query;
 
     // Объект для хранения условий поиска и фильтрации.
     const filter = {};
 
-    // поиск по названию
+    // Поиск по названию фильма.
     if (search) {
         filter.title = {
             $regex: search,
@@ -34,8 +34,23 @@ const getAllMovies = asyncHandler(async (req, res) => {
         filter.genre = genre;
     }
 
-    // Получаем фильмы с учетом поиска и фильтрации.
-    const movies = await Movie.find(filter);
+    // Разрешенные варианты сортировки.
+    const allowedSortFields = [
+        "year",
+        "-year",
+        "rating",
+        "-rating",
+        "title",
+        "-title",
+    ];
+
+    // Если сортировка разрешена — используем ее, иначе сортируем по умолчанию.
+    const sortOption = allowedSortFields.includes(sort)
+        ? sort
+        : "-year";
+
+    // Получаем фильмы с учетом поиска, фильтрации и сортировки.
+    const movies = await Movie.find(filter).sort(sortOption);
 
     res.status(200).json(movies);
 });
