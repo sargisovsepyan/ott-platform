@@ -1,3 +1,4 @@
+// Маршруты регистрации и авторизации пользователей.
 const express = require("express");
 
 const { register, login } = require("../controllers/authController");

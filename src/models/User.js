@@ -21,14 +21,14 @@ const userSchema = new mongoose.Schema(
             required: true,
         },
 
-        role: {
+        role: {//уровень доступа пользователя 
             type: String,
             enum: ["user", "admin"],
             default: "user",
         },
     },
     {
-        timestamps: true,
+        timestamps: true,//дата создания, посл. изменения
     }
 );
 

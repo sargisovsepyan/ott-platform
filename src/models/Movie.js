@@ -14,7 +14,7 @@ const movieSchema = new mongoose.Schema(
             type: Number,
             required: true,
             min: 1888,
-            max: new Date().getFullYear() + 5,
+            max: new Date().getFullYear() + 5,//которые выйдут в ближайшие 5лет
         },
 
         genre: {
@@ -38,7 +38,7 @@ const movieSchema = new mongoose.Schema(
         },
     },
     {
-        timestamps: true,
+        timestamps: true,//дата создания, посл. изменения
     }
 );
 

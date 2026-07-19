@@ -1,3 +1,4 @@
+// Оборачивает async-контроллер в try...catch.
 const asyncHandler = (controller) => {
     return async (req, res, next) => {
         try {
