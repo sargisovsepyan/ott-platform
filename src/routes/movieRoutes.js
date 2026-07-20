@@ -6,6 +6,7 @@ const router = express.Router();
 const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require("../middlewares/adminMiddleware");
 const validateMovie = require("../middlewares/validateMovie");
+const validateMovieQuery = require("../middlewares/validateMovieQuery");
 
 const {
     createMovie,
@@ -16,7 +17,7 @@ const {
 } = require("../controllers/movieController");
 
 //public
-router.get("/", getAllMovies);
+router.get("/", validateMovieQuery, getAllMovies);
 router.get("/:id", getMovieById);
 
 //admin

@@ -8,10 +8,20 @@ const createMovie = asyncHandler(async (req, res) => {
     res.status(201).json(movie);
 });
 
-// Возвращает массив фильмов с учетом поиска, фильтрации и сортировки.
+// Возвращает фильмы с учетом поиска, фильтрации, сортировки и пагинации.
 const getAllMovies = asyncHandler(async (req, res) => {
-    // Получаем параметры из URL.
-    const { search, year, genre, sort } = req.query;
+    // Получаем проверенные параметры из URL.
+    const {
+        search,
+        year,
+        genre,
+        sort,
+        page: pageNumber,
+        limit: limitNumber,
+    } = req.query;
+
+    // Сколько фильмов нужно пропустить.
+    const skip = (pageNumber - 1) * limitNumber;
 
     // Объект для хранения условий поиска и фильтрации.
     const filter = {};
@@ -34,25 +44,28 @@ const getAllMovies = asyncHandler(async (req, res) => {
         filter.genre = genre;
     }
 
-    // Разрешенные варианты сортировки.
-    const allowedSortFields = [
-        "year",
-        "-year",
-        "rating",
-        "-rating",
-        "title",
-        "-title",
-    ];
+    // Сортируем по переданному полю или по году по умолчанию.
+    const sortOption = sort || "-year";
 
-    // Если сортировка разрешена — используем ее, иначе сортируем по умолчанию.
-    const sortOption = allowedSortFields.includes(sort)
-        ? sort
-        : "-year";
+    // Общее количество фильмов с учетом поиска и фильтрации.
+    const total = await Movie.countDocuments(filter);
 
-    // Получаем фильмы с учетом поиска, фильтрации и сортировки.
-    const movies = await Movie.find(filter).sort(sortOption);
+    // Общее количество страниц.
+    const totalPages = Math.ceil(total / limitNumber);
 
-    res.status(200).json(movies);
+    // Получаем фильмы с учетом фильтрации, сортировки и пагинации.
+    const movies = await Movie.find(filter)
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limitNumber);
+
+    res.status(200).json({
+        total,
+        totalPages,
+        page: pageNumber,
+        limit: limitNumber,
+        movies,
+    });
 });
 
 //Ищет фильм по ID
