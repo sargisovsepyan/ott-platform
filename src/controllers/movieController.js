@@ -18,7 +18,7 @@ const getAllMovies = asyncHandler(async (req, res) => {
         sort,
         page: pageNumber,
         limit: limitNumber,
-    } = req.query;
+    } = req.validatedQuery;
 
     // Сколько фильмов нужно пропустить.
     const skip = (pageNumber - 1) * limitNumber;

@@ -2,9 +2,10 @@ const movieQuerySchema = require("../validations/movieQueryValidation");
 
 // Middleware для проверки query-параметров.
 const validateMovieQuery = (req, res, next) => {
-    // Проверяем query-параметры по схеме Joi.
+    // Проверяем и преобразуем query-параметры по схеме Joi.
     const { value, error } = movieQuerySchema.validate(req.query, {
         abortEarly: false,
+        convert: true,
     });
 
     // Возвращаем ошибки валидации, если параметры некорректны.
@@ -15,8 +16,8 @@ const validateMovieQuery = (req, res, next) => {
         });
     }
 
-    // Сохраняем проверенные и преобразованные параметры.
-    req.query = value;
+    // Сохраняем проверенные параметры отдельно.
+    req.validatedQuery = value;
 
     next();
 };
