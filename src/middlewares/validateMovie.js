@@ -9,18 +9,22 @@ Validate Movie Middleware
 
 // Request -> authMiddleware -> adminMiddleware -> validateMovie -> movieController
 
-const movieSchema = require("../validations/movieValidation");
+const {
+    createMovieSchema,
+    updateMovieSchema,
+} = require("../validations/movieValidation");
 
 const validateMovie = (req, res, next) => {
-    // movieSchema находится в папке validations.
-    const { error } = movieSchema.validate(req.body, {
-        abortEarly: false, //позволяет собрать все ошибки сразу
+    const schema =
+        req.method === "PATCH" ? updateMovieSchema : createMovieSchema;
+
+    const { error } = schema.validate(req.body, {
+        abortEarly: false,
     });
 
     if (error) {
         return res.status(400).json({
             message: "Validation failed",
-            // Преобразуем массив объектов ошибок Joi, в массив строк с понятными сообщениями.
             errors: error.details.map((detail) => detail.message),
         });
     }

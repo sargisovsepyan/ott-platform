@@ -1,23 +1,21 @@
-//Описывает правила валидации данных фильма с помощью Joi.
+// Описывает правила валидации данных фильма с помощью Joi.
 // Request -> Joi movieSchema -> movieValidate -> movieController
+
 const Joi = require("joi");
 
-// Создаём схему валидации для входящих данных фильма.
-const movieSchema = Joi.object({
+// Общие правила для всех полей
+const movieFields = {
     title: Joi.string()
         .trim()
         .min(1)
-        .max(150)
-        .required(),
+        .max(150),
 
     year: Joi.number()
         .min(1888)
-        .max(new Date().getFullYear() + 5)
-        .required(),
+        .max(new Date().getFullYear() + 5),
 
     genre: Joi.string()
-        .trim()
-        .required(),
+        .trim(),
 
     description: Joi.string()
         .trim()
@@ -26,6 +24,21 @@ const movieSchema = Joi.object({
     rating: Joi.number()
         .min(0)
         .max(10),
+};
+
+// Для создания фильма (POST)
+const createMovieSchema = Joi.object({
+    title: movieFields.title.required(),
+    year: movieFields.year.required(),
+    genre: movieFields.genre.required(),
+    description: movieFields.description,
+    rating: movieFields.rating,
 });
 
-module.exports = movieSchema;
+// Для частичного обновления (PATCH)
+const updateMovieSchema = Joi.object(movieFields).min(1);
+
+module.exports = {
+    createMovieSchema,
+    updateMovieSchema,
+};

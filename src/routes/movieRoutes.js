@@ -6,14 +6,18 @@ const authMiddleware = require("../middlewares/authMiddleware");
 const adminMiddleware = require("../middlewares/adminMiddleware");
 const validateMovie = require("../middlewares/validateMovie");
 const validateMovieQuery = require("../middlewares/validateMovieQuery");
+const upload = require("../middlewares/upload");
 
 const {
     createMovie,
     getAllMovies,
     getMovieById,
     updateMovie,
+    updateMoviePoster,
     deleteMovie,
 } = require("../controllers/movieController");
+
+
 
 //public
 
@@ -138,14 +142,14 @@ router.get("/", validateMovieQuery, getAllMovies);
 router.get("/:id", getMovieById);
 
 // Protected routes (Admin only)
-// POST/PATCH: Request -> authMiddleware -> adminMiddleware -> validateMovie -> movieController
+// POST/PATCH: Request -> authMiddleware -> adminMiddleware -> upload -> validateMovie -> movieController
 
 /**
  * @swagger
  * /api/movies:
  *   post:
  *     summary: Create a new movie
- *     description: Creates a new movie. Available only to administrators.
+ *     description: Creates a new movie with a poster image. Available only to administrators.
  *     tags:
  *       - Movies
  *
@@ -155,9 +159,33 @@ router.get("/:id", getMovieById);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
- *             $ref: '#/components/schemas/CreateMovieRequest'
+ *             type: object
+ *             required:
+ *               - title
+ *               - year
+ *               - genre
+ *               - poster
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: Avatar
+ *               year:
+ *                 type: integer
+ *                 example: 2022
+ *               genre:
+ *                 type: string
+ *                 example: Sci-Fi
+ *               description:
+ *                 type: string
+ *                 example: Epic science fiction movie.
+ *               rating:
+ *                 type: number
+ *                 example: 8.5
+ *               poster:
+ *                 type: string
+ *                 format: binary
  *
  *     responses:
  *       201:
@@ -195,14 +223,22 @@ router.get("/:id", getMovieById);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post("/", authMiddleware, adminMiddleware, validateMovie, createMovie);
+router.post(
+    "/",
+    authMiddleware,
+    adminMiddleware,
+    upload.single("poster"),
+    validateMovie,
+    createMovie
+);
+
 
 /**
  * @swagger
  * /api/movies/{id}:
  *   patch:
- *     summary: Update movie
- *     description: Updates an existing movie. Available only to administrators.
+ *     summary: Update movie data
+ *     description: Updates only the provided movie fields. Available only to administrators.
  *     tags:
  *       - Movies
  *
@@ -222,7 +258,20 @@ router.post("/", authMiddleware, adminMiddleware, validateMovie, createMovie);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/UpdateMovieRequest'
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               year:
+ *                 type: integer
+ *               genre:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *           example:
+ *             year: 2025
  *
  *     responses:
  *       200:
@@ -267,7 +316,98 @@ router.post("/", authMiddleware, adminMiddleware, validateMovie, createMovie);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch("/:id", authMiddleware, adminMiddleware, validateMovie, updateMovie);
+router.patch(
+    "/:id",
+    authMiddleware,
+    adminMiddleware,
+    validateMovie,
+    updateMovie
+);
+
+
+/**
+ * @swagger
+ * /api/movies/{id}/poster:
+ *   patch:
+ *     summary: Update movie poster
+ *     description: Uploads a new poster for an existing movie. Available only to administrators.
+ *     tags:
+ *       - Movies
+ *
+ *     security:
+ *       - BearerAuth: []
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Movie ID.
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - poster
+ *             properties:
+ *               poster:
+ *                 type: string
+ *                 format: binary
+ *
+ *     responses:
+ *       200:
+ *         description: Movie poster updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Movie'
+ *
+ *       400:
+ *         description: Poster is required.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       401:
+ *         description: Authentication token is missing or invalid.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       403:
+ *         description: Administrator access is required.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       404:
+ *         description: Movie not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.patch(
+    "/:id/poster",
+    authMiddleware,
+    adminMiddleware,
+    upload.single("poster"),
+    updateMoviePoster
+);
 
 /**
  * @swagger

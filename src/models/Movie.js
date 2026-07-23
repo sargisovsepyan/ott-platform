@@ -36,6 +36,10 @@ const movieSchema = new mongoose.Schema(
             max: 10,
             default: 0,
         },
+        poster: {
+            type: String,
+            required: true,
+        },
     },
     {
         timestamps: true,//дата создания, посл. изменения

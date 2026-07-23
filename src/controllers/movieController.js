@@ -1,9 +1,21 @@
 const Movie = require("../models/Movie");
 const asyncHandler = require("../utils/asyncHandler");
 
-//создаёт новый фильм в базе данных
+
+// Создаёт новый фильм в базе данных
 const createMovie = asyncHandler(async (req, res) => {
-    const movie = await Movie.create(req.body);
+    if (!req.file) {
+        return res.status(400).json({
+            message: "Poster is required",
+        });
+    }
+
+    const movieData = {
+        ...req.body,
+        poster: req.file.path,
+    };
+
+    const movie = await Movie.create(movieData);
 
     res.status(201).json(movie);
 });
@@ -83,7 +95,7 @@ const getMovieById = asyncHandler(async (req, res) => {
     res.status(200).json(movie);
 });
 
-//обновляет данные фильма, по его ID
+// Обновляет переданные поля фильма.
 const updateMovie = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
@@ -91,6 +103,36 @@ const updateMovie = asyncHandler(async (req, res) => {
         new: true,
         runValidators: true,
     });
+
+    if (!updatedMovie) {
+        return res.status(404).json({
+            message: "Movie not found",
+        });
+    }
+
+    res.status(200).json(updatedMovie);
+});
+
+// Обновляет постер фильма.
+const updateMoviePoster = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    if (!req.file) {
+        return res.status(400).json({
+            message: "Poster is required",
+        });
+    }
+
+    const updatedMovie = await Movie.findByIdAndUpdate(
+        id,
+        {
+            poster: req.file.path,
+        },
+        {
+            new: true,
+            runValidators: true,
+        }
+    );
 
     if (!updatedMovie) {
         return res.status(404).json({
@@ -123,5 +165,6 @@ module.exports = {
     getAllMovies,
     getMovieById,
     updateMovie,
+    updateMoviePoster,
     deleteMovie,
 };

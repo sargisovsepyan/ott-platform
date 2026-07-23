@@ -21,6 +21,14 @@ const options = {
             schemas: {
                 Movie: {
                     type: "object",
+                    required: [
+                        "title",
+                        "year",
+                        "genre",
+                        "description",
+                        "rating",
+                        "poster",
+                    ],
                     properties: {
                         _id: {
                             type: "string",
@@ -50,6 +58,11 @@ const options = {
                         rating: {
                             type: "number",
                             example: 8.5,
+                        },
+
+                        poster: {
+                            type: "string",
+                            example: "https://res.cloudinary.com/your-cloud/image/upload/example.jpg",
                         },
 
                         createdAt: {
@@ -88,67 +101,6 @@ const options = {
                             items: {
                                 $ref: "#/components/schemas/Movie",
                             },
-                        },
-                    },
-                },
-
-                CreateMovieRequest: {
-                    type: "object",
-                    required: ["title", "year", "genre", "description", "rating"],
-                    properties: {
-                        title: {
-                            type: "string",
-                            example: "Avatar",
-                        },
-
-                        year: {
-                            type: "integer",
-                            example: 2022,
-                        },
-
-                        genre: {
-                            type: "string",
-                            example: "Sci-Fi",
-                        },
-
-                        description: {
-                            type: "string",
-                            example: "Epic science fiction movie.",
-                        },
-
-                        rating: {
-                            type: "number",
-                            example: 8.5,
-                        },
-                    },
-                },
-
-                UpdateMovieRequest: {
-                    type: "object",
-                    properties: {
-                        title: {
-                            type: "string",
-                            example: "Avatar 2",
-                        },
-
-                        year: {
-                            type: "integer",
-                            example: 2023,
-                        },
-
-                        genre: {
-                            type: "string",
-                            example: "Sci-Fi",
-                        },
-
-                        description: {
-                            type: "string",
-                            example: "Updated movie description.",
-                        },
-
-                        rating: {
-                            type: "number",
-                            example: 9.2,
                         },
                     },
                 },
