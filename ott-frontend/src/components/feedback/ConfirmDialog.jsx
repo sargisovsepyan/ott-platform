@@ -79,7 +79,7 @@ export function ConfirmDialog({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] grid place-items-center bg-black/72 px-4"
+      className="fixed inset-0 z-[100] grid place-items-center bg-overlay px-4 backdrop-blur-sm"
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !isLoading) {
@@ -93,7 +93,7 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-message"
-        className="w-full max-w-lg rounded-md border border-border bg-surface-raised p-5 sm:p-6"
+        className="panel-surface w-full max-w-lg rounded-lg p-5 sm:p-7"
       >
         <div className="flex items-start justify-between gap-4">
           <div>

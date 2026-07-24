@@ -32,6 +32,28 @@ export function MobileNavigation({
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
         onClose();
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusable = panelRef.current?.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) {
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
@@ -48,19 +70,26 @@ export function MobileNavigation({
   }
 
   return (
-    <div className="fixed inset-0 top-15 z-40 bg-background md:hidden">
+    <div
+      className="fixed inset-0 top-15 z-40 bg-overlay backdrop-blur-sm md:top-17 lg:hidden"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <nav
         ref={panelRef}
         tabIndex={-1}
         aria-label="Mobile navigation"
-        className="content-container py-5"
+        className="ml-auto flex h-full w-full max-w-sm flex-col border-l border-border bg-background-elevated px-5 py-5 shadow-panel"
       >
         <div className="mb-4 flex justify-end">
           <IconButton label="Close menu" onClick={onClose}>
             <X className="size-5" aria-hidden="true" />
           </IconButton>
         </div>
-        <div className="grid border-t border-border">
+        <div className="grid border-t border-border/80">
           {links.map((link) => (
             <NavLink
               key={link.to}
@@ -69,8 +98,8 @@ export function MobileNavigation({
               onClick={onClose}
               className={({ isActive }) =>
                 [
-                  "flex min-h-12 items-center border-b border-border text-lg font-medium",
-                  isActive ? "text-text" : "text-text-muted",
+                  "flex min-h-14 items-center border-b border-border/80 text-lg font-semibold transition-colors duration-[180ms]",
+                  isActive ? "text-text" : "text-text-muted hover:text-text",
                 ].join(" ")
               }
             >
@@ -81,14 +110,19 @@ export function MobileNavigation({
             <NavLink
               to="/admin/movies"
               onClick={onClose}
-              className="flex min-h-12 items-center border-b border-border text-lg font-medium text-text-muted"
+              className={({ isActive }) =>
+                [
+                  "flex min-h-14 items-center border-b border-border/80 text-lg font-semibold transition-colors duration-[180ms]",
+                  isActive ? "text-text" : "text-text-muted hover:text-text",
+                ].join(" ")
+              }
             >
               Admin
             </NavLink>
           ) : null}
           {isAuthenticated ? (
             <>
-              <p className="m-0 border-b border-border py-3 text-sm text-text-subtle">
+              <p className="m-0 border-b border-border/80 py-4 text-sm text-text-subtle">
                 Signed in as {userName}
               </p>
               <button
@@ -97,7 +131,7 @@ export function MobileNavigation({
                   onLogout();
                   onClose();
                 }}
-                className="flex min-h-12 items-center border-b border-border text-left text-lg font-medium text-text-muted"
+                className="flex min-h-14 items-center border-b border-border/80 text-left text-lg font-semibold text-text-muted transition-colors duration-[180ms] hover:text-text"
               >
                 Log out
               </button>
@@ -107,14 +141,14 @@ export function MobileNavigation({
               <NavLink
                 to="/login"
                 onClick={onClose}
-                className="flex min-h-12 items-center border-b border-border text-lg font-medium text-text-muted"
+                className="flex min-h-14 items-center border-b border-border/80 text-lg font-semibold text-text-muted transition-colors duration-[180ms] hover:text-text"
               >
                 Log in
               </NavLink>
               <NavLink
                 to="/register"
                 onClick={onClose}
-                className="flex min-h-12 items-center border-b border-border text-lg font-medium text-text-muted"
+                className="flex min-h-14 items-center border-b border-border/80 text-lg font-semibold text-text-muted transition-colors duration-[180ms] hover:text-text"
               >
                 Register
               </NavLink>

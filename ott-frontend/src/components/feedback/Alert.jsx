@@ -30,7 +30,7 @@ export function Alert({ tone = "info", title, children, className = "" }) {
   return (
     <div
       className={[
-        "rounded-sm border border-border border-l-4 bg-surface px-4 py-3",
+        "rounded-md border border-border/90 border-l-4 bg-surface-raised/80 px-4 py-3.5 shadow-card",
         config.border,
         className,
       ].join(" ")}

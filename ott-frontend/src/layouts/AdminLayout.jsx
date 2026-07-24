@@ -9,10 +9,13 @@ const links = [
 
 export function AdminLayout() {
   return (
-    <div>
-      <div className="border-b border-border bg-surface">
+    <div className="min-w-0">
+      <div className="border-b border-border/70 bg-background-elevated/75 backdrop-blur-lg">
         <PageContainer>
-          <nav className="flex min-h-12 items-center gap-6" aria-label="Administration">
+          <nav
+            className="scrollbar-hidden flex min-h-14 items-center gap-7 overflow-x-auto"
+            aria-label="Administration"
+          >
             {links.map((link) => {
               const Icon = link.icon;
               return (
@@ -22,7 +25,7 @@ export function AdminLayout() {
                   end={link.end}
                   className={({ isActive }) =>
                     [
-                      "inline-flex min-h-12 items-center gap-2 border-b-2 text-sm font-semibold",
+                      "inline-flex min-h-14 shrink-0 items-center gap-2 border-b-2 text-sm font-semibold transition-colors duration-[180ms]",
                       isActive
                         ? "border-primary text-text"
                         : "border-transparent text-text-muted hover:text-text",

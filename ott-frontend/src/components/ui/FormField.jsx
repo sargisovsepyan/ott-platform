@@ -12,8 +12,8 @@ export function FormField({
     .join(" ");
 
   return (
-    <div className={["grid gap-2", className].join(" ")}>
-      <label htmlFor={id} className="text-sm font-semibold text-text">
+    <div className={["grid gap-2.5", className].join(" ")}>
+      <label htmlFor={id} className="text-sm font-semibold tracking-[0.01em] text-text">
         {label}
         {required ? (
           <span className="ml-1 text-danger" aria-hidden="true">

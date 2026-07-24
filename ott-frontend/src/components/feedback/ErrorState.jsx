@@ -10,13 +10,15 @@ export function ErrorState({
   return (
     <section
       className={[
-        "grid min-h-64 place-items-center rounded-md border border-border bg-surface px-6 py-12 text-center",
+        "panel-surface grid min-h-72 place-items-center rounded-lg px-6 py-14 text-center",
         className,
       ].join(" ")}
       role="alert"
     >
       <div className="max-w-md">
-        <AlertTriangle className="mx-auto size-9 text-danger" aria-hidden="true" />
+        <span className="mx-auto grid size-14 place-items-center rounded-full border border-danger/35 bg-danger/10 text-danger">
+          <AlertTriangle className="size-6" aria-hidden="true" />
+        </span>
         <h2 className="mt-4 text-2xl font-semibold text-text">{title}</h2>
         <p className="mt-2 text-text-muted">{message}</p>
         {onRetry ? (
