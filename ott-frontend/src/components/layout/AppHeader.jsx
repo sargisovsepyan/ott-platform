@@ -3,6 +3,7 @@ import { Menu, Search } from "lucide-react";
 import { NavLink, Link as RouterLink } from "react-router";
 import { IconButton } from "../ui/IconButton";
 import { buttonClassName } from "../ui/buttonStyles";
+import { useAuth } from "../../hooks/useAuth";
 import { MobileNavigation } from "./MobileNavigation";
 import { PageContainer } from "./PageContainer";
 
@@ -15,6 +16,7 @@ export function AppHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef(null);
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   return (
     <>
@@ -46,6 +48,21 @@ export function AppHeader() {
                 {link.label}
               </NavLink>
             ))}
+            {isAdmin ? (
+              <NavLink
+                to="/admin/movies"
+                className={({ isActive }) =>
+                  [
+                    "relative flex h-full items-center text-sm font-medium transition-colors duration-[140ms] ease-out",
+                    isActive
+                      ? "text-text after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary"
+                      : "text-text-muted hover:text-text",
+                  ].join(" ")
+                }
+              >
+                Admin
+              </NavLink>
+            ) : null}
           </nav>
 
           <div className="ml-auto hidden items-center gap-2 md:flex">
@@ -56,12 +73,25 @@ export function AppHeader() {
             >
               <Search className="size-5" aria-hidden="true" />
             </RouterLink>
-            <RouterLink to="/login" className={buttonClassName("ghost")}>
-              Log in
-            </RouterLink>
-            <RouterLink to="/register" className={buttonClassName("secondary")}>
-              Register
-            </RouterLink>
+            {isAuthenticated ? (
+              <>
+                <span className="max-w-32 truncate px-2 text-sm text-text-muted">
+                  {user?.name || user?.email}
+                </span>
+                <button className={buttonClassName("secondary")} onClick={logout}>
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <RouterLink to="/login" className={buttonClassName("ghost")}>
+                  Log in
+                </RouterLink>
+                <RouterLink to="/register" className={buttonClassName("secondary")}>
+                  Register
+                </RouterLink>
+              </>
+            )}
           </div>
 
           <IconButton
@@ -81,6 +111,10 @@ export function AppHeader() {
           isOpen={isMenuOpen}
           onClose={closeMenu}
           returnFocusRef={menuButtonRef}
+          isAuthenticated={isAuthenticated}
+          isAdmin={isAdmin}
+          userName={user?.name || user?.email}
+          onLogout={logout}
         />
       </div>
     </>

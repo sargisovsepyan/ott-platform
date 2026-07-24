@@ -8,7 +8,15 @@ const links = [
   { to: "/movies", label: "Movies" },
 ];
 
-export function MobileNavigation({ isOpen, onClose, returnFocusRef }) {
+export function MobileNavigation({
+  isOpen,
+  onClose,
+  returnFocusRef,
+  isAuthenticated,
+  isAdmin,
+  userName,
+  onLogout,
+}) {
   const panelRef = useRef(null);
 
   useEffect(() => {
@@ -69,20 +77,49 @@ export function MobileNavigation({ isOpen, onClose, returnFocusRef }) {
               {link.label}
             </NavLink>
           ))}
-          <NavLink
-            to="/login"
-            onClick={onClose}
-            className="flex min-h-12 items-center border-b border-border text-lg font-medium text-text-muted"
-          >
-            Log in
-          </NavLink>
-          <NavLink
-            to="/register"
-            onClick={onClose}
-            className="flex min-h-12 items-center border-b border-border text-lg font-medium text-text-muted"
-          >
-            Register
-          </NavLink>
+          {isAdmin ? (
+            <NavLink
+              to="/admin/movies"
+              onClick={onClose}
+              className="flex min-h-12 items-center border-b border-border text-lg font-medium text-text-muted"
+            >
+              Admin
+            </NavLink>
+          ) : null}
+          {isAuthenticated ? (
+            <>
+              <p className="m-0 border-b border-border py-3 text-sm text-text-subtle">
+                Signed in as {userName}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  onLogout();
+                  onClose();
+                }}
+                className="flex min-h-12 items-center border-b border-border text-left text-lg font-medium text-text-muted"
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                onClick={onClose}
+                className="flex min-h-12 items-center border-b border-border text-lg font-medium text-text-muted"
+              >
+                Log in
+              </NavLink>
+              <NavLink
+                to="/register"
+                onClick={onClose}
+                className="flex min-h-12 items-center border-b border-border text-lg font-medium text-text-muted"
+              >
+                Register
+              </NavLink>
+            </>
+          )}
         </div>
       </nav>
     </div>

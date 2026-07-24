@@ -10,6 +10,8 @@ import { NotFoundPage } from "../pages/errors/NotFoundPage";
 import { HomePage } from "../pages/public/HomePage";
 import { MovieDetailsPage } from "../pages/public/MovieDetailsPage";
 import { MoviesPage } from "../pages/public/MoviesPage";
+import { AdminRoute } from "../routes/AdminRoute";
+import { PublicOnlyRoute } from "../routes/PublicOnlyRoute";
 
 export function AppRouter() {
   return (
@@ -18,12 +20,16 @@ export function AppRouter() {
         <Route index element={<HomePage />} />
         <Route path="movies" element={<MoviesPage />} />
         <Route path="movies/:id" element={<MovieDetailsPage />} />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
-        <Route path="admin" element={<Navigate to="/admin/movies" replace />} />
-        <Route path="admin/movies" element={<AdminMoviesPage />} />
-        <Route path="admin/movies/new" element={<CreateMoviePage />} />
-        <Route path="admin/movies/:id/edit" element={<EditMoviePage />} />
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+        </Route>
+        <Route element={<AdminRoute />}>
+          <Route path="admin" element={<Navigate to="/admin/movies" replace />} />
+          <Route path="admin/movies" element={<AdminMoviesPage />} />
+          <Route path="admin/movies/new" element={<CreateMoviePage />} />
+          <Route path="admin/movies/:id/edit" element={<EditMoviePage />} />
+        </Route>
         <Route path="forbidden" element={<ForbiddenPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
