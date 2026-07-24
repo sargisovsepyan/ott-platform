@@ -43,7 +43,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }) {
             key={item}
             type="button"
             className={[
-              "size-11 rounded-md border text-sm font-semibold tabular-nums transition-colors duration-[180ms] ease-out",
+              "size-11 rounded-md border text-sm font-semibold tabular-nums transition-colors duration-[140ms] ease-out",
               item === currentPage
                 ? "border-primary bg-primary-soft text-text"
                 : "border-transparent text-text-muted hover:border-border hover:bg-surface-hover hover:text-text",

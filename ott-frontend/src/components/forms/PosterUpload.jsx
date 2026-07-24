@@ -111,7 +111,7 @@ export function PosterUpload({
       />
       <div
         className={[
-          "mt-5 rounded-lg border bg-surface/55 p-4 transition-[background-color,border-color,box-shadow] duration-[180ms] ease-out sm:p-5",
+          "mt-5 rounded-lg border bg-surface/55 p-4 transition-[background-color,border-color,box-shadow] duration-[140ms] ease-out sm:p-5",
           isDragging
             ? "border-primary bg-primary-soft/60 shadow-glow"
             : "border-border/80",
@@ -166,7 +166,7 @@ export function PosterUpload({
         ) : (
           <button
             type="button"
-            className="grid min-h-64 w-full place-items-center rounded-md border border-dashed border-border-strong bg-background-elevated/45 px-5 text-center text-text-muted transition-[background-color,border-color,color] duration-[180ms] hover:border-primary hover:bg-primary-soft/25 hover:text-text"
+            className="grid min-h-64 w-full place-items-center rounded-md border border-dashed border-border-strong bg-background-elevated/45 px-5 text-center text-text-muted transition-[background-color,border-color,color] duration-[140ms] ease-out hover:border-primary hover:bg-primary-soft/25 hover:text-text"
             onClick={() => inputRef.current?.click()}
           >
             <span>

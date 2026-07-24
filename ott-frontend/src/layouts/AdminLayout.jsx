@@ -25,7 +25,7 @@ export function AdminLayout() {
                   end={link.end}
                   className={({ isActive }) =>
                     [
-                      "inline-flex min-h-14 shrink-0 items-center gap-2 border-b-2 text-sm font-semibold transition-colors duration-[180ms]",
+                      "inline-flex min-h-14 shrink-0 items-center gap-2 border-b-2 text-sm font-semibold transition-colors duration-[140ms]",
                       isActive
                         ? "border-primary text-text"
                         : "border-transparent text-text-muted hover:text-text",

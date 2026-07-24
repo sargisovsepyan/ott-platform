@@ -32,7 +32,7 @@ export function AppHeader() {
     <>
       <header
         className={[
-          "fixed inset-x-0 top-0 z-50 h-15 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-[240ms] ease-out md:h-17 lg:h-18",
+          "fixed inset-x-0 top-0 z-50 h-15 border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-[140ms] ease-out md:h-17 lg:h-18",
           isHome && !isScrolled
             ? "border-transparent bg-background/25"
             : "border-border/80 bg-background-elevated/88 shadow-nav backdrop-blur-xl",
@@ -44,7 +44,7 @@ export function AppHeader() {
             className="group inline-flex min-h-11 items-center gap-2.5 text-lg font-bold tracking-[0.14em] text-text"
             aria-label="Lumio home"
           >
-            <span className="grid size-8 place-items-center rounded-md border border-primary/55 bg-primary-soft text-primary-hover transition-colors duration-[180ms] group-hover:border-primary group-hover:bg-primary/20">
+            <span className="grid size-8 place-items-center rounded-md border border-primary/55 bg-primary-soft text-primary-hover transition-colors duration-[140ms] ease-out group-hover:border-primary group-hover:bg-primary/20">
               <Clapperboard className="size-4.5" aria-hidden="true" />
             </span>
             LUMIO
@@ -58,7 +58,7 @@ export function AppHeader() {
                 end={link.end}
                 className={({ isActive }) =>
                   [
-                    "relative flex h-full items-center text-sm font-semibold transition-colors duration-[180ms] ease-out",
+                    "relative flex h-full items-center text-sm font-semibold transition-colors duration-[140ms] ease-out",
                     isActive
                       ? "text-text after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary"
                       : "text-text-muted hover:text-text",
@@ -73,7 +73,7 @@ export function AppHeader() {
                 to="/admin/movies"
                 className={({ isActive }) =>
                   [
-                    "relative flex h-full items-center text-sm font-semibold transition-colors duration-[180ms] ease-out",
+                    "relative flex h-full items-center text-sm font-semibold transition-colors duration-[140ms] ease-out",
                     isActive
                       ? "text-text after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary"
                       : "text-text-muted hover:text-text",
@@ -88,7 +88,7 @@ export function AppHeader() {
           <div className="ml-auto hidden min-w-0 items-center justify-end gap-2 lg:flex">
             <RouterLink
               to="/movies"
-              className="inline-flex size-11 items-center justify-center rounded-md border border-transparent text-text-muted transition-colors duration-[180ms] hover:border-border hover:bg-surface-hover hover:text-text"
+              className="inline-flex size-11 items-center justify-center rounded-md border border-transparent text-text-muted transition-colors duration-[140ms] ease-out hover:border-border hover:bg-surface-hover hover:text-text"
               aria-label="Search movies"
             >
               <Search className="size-5" aria-hidden="true" />

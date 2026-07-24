@@ -62,7 +62,7 @@ export function MovieDetailsPage() {
   if (state.status === "error") {
     const isNotFound = state.statusCode === 404;
     return (
-      <PageContainer className="page-section">
+      <PageContainer className="details-page page-section">
         <ErrorState
           title={isNotFound ? "Movie not found" : "Movie details are unavailable"}
           message={
@@ -82,7 +82,7 @@ export function MovieDetailsPage() {
     <PageContainer className="details-page page-section">
       <Link
         to="/movies"
-        className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-text-muted transition-colors duration-[180ms] hover:bg-surface-hover hover:text-text"
+        className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-text-muted transition-colors duration-[140ms] ease-out hover:bg-surface-hover hover:text-text"
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
         Back to movies

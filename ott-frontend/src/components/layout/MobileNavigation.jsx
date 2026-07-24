@@ -98,7 +98,7 @@ export function MobileNavigation({
               onClick={onClose}
               className={({ isActive }) =>
                 [
-                  "flex min-h-14 items-center border-b border-border/80 text-lg font-semibold transition-colors duration-[180ms]",
+                  "flex min-h-14 items-center border-b border-border/80 text-lg font-semibold transition-colors duration-[140ms] ease-out",
                   isActive ? "text-text" : "text-text-muted hover:text-text",
                 ].join(" ")
               }
@@ -112,7 +112,7 @@ export function MobileNavigation({
               onClick={onClose}
               className={({ isActive }) =>
                 [
-                  "flex min-h-14 items-center border-b border-border/80 text-lg font-semibold transition-colors duration-[180ms]",
+                  "flex min-h-14 items-center border-b border-border/80 text-lg font-semibold transition-colors duration-[140ms] ease-out",
                   isActive ? "text-text" : "text-text-muted hover:text-text",
                 ].join(" ")
               }
@@ -131,7 +131,7 @@ export function MobileNavigation({
                   onLogout();
                   onClose();
                 }}
-                className="flex min-h-14 items-center border-b border-border/80 text-left text-lg font-semibold text-text-muted transition-colors duration-[180ms] hover:text-text"
+                className="flex min-h-14 items-center border-b border-border/80 text-left text-lg font-semibold text-text-muted transition-colors duration-[140ms] ease-out hover:text-text"
               >
                 Log out
               </button>
@@ -141,14 +141,14 @@ export function MobileNavigation({
               <NavLink
                 to="/login"
                 onClick={onClose}
-                className="flex min-h-14 items-center border-b border-border/80 text-lg font-semibold text-text-muted transition-colors duration-[180ms] hover:text-text"
+                className="flex min-h-14 items-center border-b border-border/80 text-lg font-semibold text-text-muted transition-colors duration-[140ms] ease-out hover:text-text"
               >
                 Log in
               </NavLink>
               <NavLink
                 to="/register"
                 onClick={onClose}
-                className="flex min-h-14 items-center border-b border-border/80 text-lg font-semibold text-text-muted transition-colors duration-[180ms] hover:text-text"
+                className="flex min-h-14 items-center border-b border-border/80 text-lg font-semibold text-text-muted transition-colors duration-[140ms] ease-out hover:text-text"
               >
                 Register
               </NavLink>

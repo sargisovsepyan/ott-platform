@@ -14,7 +14,7 @@ export function MovieCard({ movie, className = "" }) {
           title={movie.title}
           year={movie.year}
           sizes="(min-width: 1536px) 190px, (min-width: 1280px) 18vw, (min-width: 768px) 25vw, 46vw"
-          className="rounded-md border-border/80 transition-colors duration-[180ms] ease-out group-hover:border-primary/45"
+          className="rounded-md border-border/80 transition-colors duration-[140ms] ease-out group-hover:border-primary/45"
           imageClassName="motion-zoom transition-transform duration-[480ms] ease-out group-hover:scale-[1.035]"
         />
         <div className="px-1.5 pb-0.5 pt-3">

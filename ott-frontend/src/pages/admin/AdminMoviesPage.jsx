@@ -264,7 +264,7 @@ export function AdminMoviesPage() {
                   {state.movies.map((movie) => (
                     <tr
                       key={movie.id}
-                      className="border-t border-border/75 transition-colors duration-[180ms] hover:bg-surface-hover/55"
+                      className="border-t border-border/75 transition-colors duration-[140ms] ease-out hover:bg-surface-hover/55"
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-4">
