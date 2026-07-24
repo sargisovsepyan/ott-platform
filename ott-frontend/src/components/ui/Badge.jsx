@@ -1,4 +1,4 @@
-export function Badge({ children, tone = "neutral", className = "" }) {
+export function Badge({ children, tone = "neutral", className = "", ...props }) {
   const tones = {
     neutral: "border-border bg-surface text-text-muted",
     primary: "border-primary bg-primary-soft text-text",
@@ -14,6 +14,7 @@ export function Badge({ children, tone = "neutral", className = "" }) {
         tones[tone] ?? tones.neutral,
         className,
       ].join(" ")}
+      {...props}
     >
       {children}
     </span>
