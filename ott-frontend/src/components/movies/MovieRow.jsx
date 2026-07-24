@@ -1,15 +1,25 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 import { IconButton } from "../ui/IconButton";
 import { MovieCard } from "./MovieCard";
 
-export function MovieRow({ title, eyebrow, movies, viewAllHref = "/movies" }) {
+export function MovieRow({
+  title,
+  eyebrow,
+  description,
+  movies,
+  viewAllHref = "/movies",
+}) {
   const scrollerRef = useRef(null);
   const [canScrollPrevious, setCanScrollPrevious] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(movies.length > 1);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+  const uniqueMovies = movies.filter(
+    (movie, index, collection) =>
+      collection.findIndex((candidate) => candidate.id === movie.id) === index,
+  );
 
-  const updateControls = () => {
+  const updateControls = useCallback(() => {
     const element = scrollerRef.current;
     if (!element) {
       return;
@@ -18,7 +28,19 @@ export function MovieRow({ title, eyebrow, movies, viewAllHref = "/movies" }) {
     setCanScrollNext(
       element.scrollLeft + element.clientWidth < element.scrollWidth - 8,
     );
-  };
+  }, []);
+
+  useEffect(() => {
+    const element = scrollerRef.current;
+    if (!element) {
+      return undefined;
+    }
+
+    updateControls();
+    const observer = new ResizeObserver(updateControls);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [uniqueMovies.length, updateControls]);
 
   const scroll = (direction) => {
     const element = scrollerRef.current;
@@ -31,16 +53,20 @@ export function MovieRow({ title, eyebrow, movies, viewAllHref = "/movies" }) {
     });
   };
 
-  if (!movies.length) {
+  if (!uniqueMovies.length) {
     return null;
   }
 
   return (
-    <section aria-labelledby={`row-${title.replace(/\s+/g, "-").toLowerCase()}`}>
-      <div className="content-container mb-5 flex items-end justify-between gap-4">
-        <div>
+    <section
+      className="min-w-0 max-w-full overflow-hidden"
+      aria-labelledby={`row-${title.replace(/\s+/g, "-").toLowerCase()}`}
+    >
+      <div className="content-container min-w-0">
+        <div className="mb-3 flex min-w-0 items-end justify-between gap-4 sm:mb-4">
+          <div className="min-w-0">
           {eyebrow ? (
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.1em] text-primary-hover">
+            <p className="page-eyebrow mb-2">
               {eyebrow}
             </p>
           ) : null}
@@ -50,15 +76,20 @@ export function MovieRow({ title, eyebrow, movies, viewAllHref = "/movies" }) {
           >
             {title}
           </h2>
+          {description ? (
+            <p className="mt-2 max-w-xl text-sm text-text-muted sm:text-base">
+              {description}
+            </p>
+          ) : null}
         </div>
-        <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1">
           <Link
             to={viewAllHref}
-            className="mr-2 text-sm font-semibold text-primary-hover hover:underline"
+              className="mr-1 min-h-11 content-center px-2 text-sm font-semibold text-primary-hover hover:underline sm:mr-2"
           >
             View all
           </Link>
-          <div className="hidden md:flex">
+            <div className="hidden lg:flex">
             <IconButton
               label={`Scroll ${title} left`}
               disabled={!canScrollPrevious}
@@ -76,20 +107,21 @@ export function MovieRow({ title, eyebrow, movies, viewAllHref = "/movies" }) {
           </div>
         </div>
       </div>
-      <div
-        ref={scrollerRef}
-        onScroll={updateControls}
-        className="scrollbar-hidden flex snap-x snap-proximity gap-4 overflow-x-auto px-4 pb-2 sm:px-6 md:gap-5 lg:gap-6 lg:px-10"
-        tabIndex={0}
-        aria-label={`${title} movies`}
-      >
-        {movies.map((movie) => (
-          <MovieCard
-            key={movie.id}
-            movie={movie}
-            className="w-[44vw] shrink-0 snap-start sm:w-[42vw] md:w-48 lg:w-52 xl:w-56"
-          />
-        ))}
+        <div
+          ref={scrollerRef}
+          onScroll={updateControls}
+          className="scrollbar-hidden overscroll-inline-contain flex min-w-0 max-w-full touch-pan-x snap-x snap-proximity gap-3 overflow-x-auto overflow-y-hidden py-4 sm:gap-4 md:gap-5 lg:gap-6"
+          tabIndex={0}
+          aria-label={`${title} movies`}
+        >
+          {uniqueMovies.map((movie) => (
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              className="min-w-36 basis-[44%] shrink-0 snap-start sm:basis-[38%] md:basis-[23%] lg:basis-[18%] 2xl:basis-[14%]"
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

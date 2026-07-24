@@ -7,10 +7,13 @@ export function MovieGridSkeleton({ count = 12 }) {
       aria-label="Loading movies"
     >
       {Array.from({ length: count }, (_, index) => (
-        <div key={index}>
+        <div
+          key={index}
+          className="rounded-lg border border-border/50 bg-surface/55 p-2 pb-4"
+        >
           <Skeleton className="aspect-[2/3]" />
-          <Skeleton className="mt-3 h-5 w-4/5" />
-          <Skeleton className="mt-2 h-4 w-3/5" />
+          <Skeleton className="mx-1.5 mt-3 h-5 w-4/5" />
+          <Skeleton className="mx-1.5 mt-2 h-4 w-3/5" />
         </div>
       ))}
     </div>

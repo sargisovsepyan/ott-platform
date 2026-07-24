@@ -1,12 +1,28 @@
 import { useState } from "react";
-import { Film } from "lucide-react";
+import { Clapperboard } from "lucide-react";
+
+function getInitials(title) {
+  const words = title?.trim().split(/\s+/).filter(Boolean) ?? [];
+  if (!words.length) {
+    return "L";
+  }
+
+  return words
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+}
 
 export function PosterImage({
   src,
   title,
+  year,
   className = "",
+  imageClassName = "",
   loading = "lazy",
   sizes,
+  decorative = false,
 }) {
   const [failedSource, setFailedSource] = useState("");
   const fallbackLabel = title ? `No poster available for ${title}` : "No poster available";
@@ -22,22 +38,46 @@ export function PosterImage({
       {!showFallback ? (
         <img
           src={src}
-          alt={`Poster for ${title}`}
+          alt={decorative ? "" : `Poster for ${title}`}
           loading={loading}
           sizes={sizes}
-          className="absolute inset-0 size-full object-cover"
+          className={[
+            "absolute inset-0 size-full object-cover",
+            imageClassName,
+          ].join(" ")}
           onError={() => setFailedSource(src)}
+          onLoad={(event) => {
+            const ratio =
+              event.currentTarget.naturalWidth / event.currentTarget.naturalHeight;
+            if (!Number.isFinite(ratio) || ratio < 0.45 || ratio > 0.85) {
+              setFailedSource(src);
+            }
+          }}
         />
       ) : null}
       {showFallback ? (
         <div
-          className="absolute inset-0 grid place-items-center px-3 text-center text-text-subtle"
-          role="img"
-          aria-label={fallbackLabel}
+          className="poster-fallback absolute inset-0 grid place-items-center px-4 text-center"
+          role={decorative ? undefined : "img"}
+          aria-hidden={decorative || undefined}
+          aria-label={decorative ? undefined : fallbackLabel}
         >
-          <div>
-            <Film className="mx-auto size-8" aria-hidden="true" />
-            <span className="mt-3 block text-xs font-medium">{title}</span>
+          <div className="relative z-10">
+            <Clapperboard
+              className="mx-auto size-6 text-primary-hover/85"
+              aria-hidden="true"
+            />
+            <span className="mt-4 block text-4xl font-bold tracking-[-0.04em] text-text/90">
+              {getInitials(title)}
+            </span>
+            <span className="mx-auto mt-4 block max-w-36 text-xs font-semibold leading-snug text-text-muted">
+              {title || "Lumio"}
+            </span>
+            {year ? (
+              <span className="mt-2 block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-text-subtle">
+                {year}
+              </span>
+            ) : null}
           </div>
         </div>
       ) : null}
