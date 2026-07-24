@@ -5,10 +5,15 @@ const authRoutes = require("./routes/authRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
+const limiter = require("./middlewares/rateLimiter");
+const morgan = require("morgan");
 
 const app = express();
 
+app.use(morgan("dev"));
+app.use(limiter);
 app.use(express.json());
+
 
 // Подключаем Swagger UI.
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
