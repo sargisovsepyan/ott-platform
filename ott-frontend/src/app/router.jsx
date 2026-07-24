@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router";
 import { PublicLayout } from "../layouts/PublicLayout";
+import { AdminLayout } from "../layouts/AdminLayout";
 import { AdminMoviesPage } from "../pages/admin/AdminMoviesPage";
 import { CreateMoviePage } from "../pages/admin/CreateMoviePage";
 import { EditMoviePage } from "../pages/admin/EditMoviePage";
@@ -25,10 +26,12 @@ export function AppRouter() {
           <Route path="register" element={<RegisterPage />} />
         </Route>
         <Route element={<AdminRoute />}>
-          <Route path="admin" element={<Navigate to="/admin/movies" replace />} />
-          <Route path="admin/movies" element={<AdminMoviesPage />} />
-          <Route path="admin/movies/new" element={<CreateMoviePage />} />
-          <Route path="admin/movies/:id/edit" element={<EditMoviePage />} />
+          <Route element={<AdminLayout />}>
+            <Route path="admin" element={<Navigate to="/admin/movies" replace />} />
+            <Route path="admin/movies" element={<AdminMoviesPage />} />
+            <Route path="admin/movies/new" element={<CreateMoviePage />} />
+            <Route path="admin/movies/:id/edit" element={<EditMoviePage />} />
+          </Route>
         </Route>
         <Route path="forbidden" element={<ForbiddenPage />} />
         <Route path="*" element={<NotFoundPage />} />
