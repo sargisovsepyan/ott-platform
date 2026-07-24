@@ -16,6 +16,16 @@ export function ConfirmDialog({
 }) {
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const isLoadingRef = useRef(isLoading);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -28,8 +38,8 @@ export function ConfirmDialog({
     closeButtonRef.current?.focus();
 
     const handleKeyDown = (event) => {
-      if (event.key === "Escape" && !isLoading) {
-        onClose();
+      if (event.key === "Escape" && !isLoadingRef.current) {
+        onCloseRef.current();
         return;
       }
 
@@ -61,7 +71,7 @@ export function ConfirmDialog({
       document.removeEventListener("keydown", handleKeyDown);
       previouslyFocused?.focus();
     };
-  }, [isLoading, isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) {
     return null;

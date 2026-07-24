@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import { Alert } from "../feedback/Alert";
 import { Button } from "../ui/Button";
+import { buttonClassName } from "../ui/buttonStyles";
 import { FormField } from "../ui/FormField";
 import { Input } from "../ui/Input";
 import { Textarea } from "../ui/Textarea";
@@ -56,6 +58,7 @@ export function MovieForm({
   submitLabel,
   isSubmitting,
   requestError,
+  cancelHref = "/admin/movies",
   children,
 }) {
   const [values, setValues] = useState(() => createValues(initialValues));
@@ -188,13 +191,15 @@ export function MovieForm({
       </div>
       {children}
       <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end">
-        <Button
-          variant="secondary"
-          onClick={() => window.history.back()}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
+        {isSubmitting ? (
+          <Button variant="secondary" disabled>
+            Cancel
+          </Button>
+        ) : (
+          <Link to={cancelHref} className={buttonClassName("secondary")}>
+            Cancel
+          </Link>
+        )}
         <Button type="submit" isLoading={isSubmitting}>
           {submitLabel}
         </Button>

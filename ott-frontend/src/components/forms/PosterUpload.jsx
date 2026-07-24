@@ -84,7 +84,7 @@ export function PosterUpload({
           <h2 id="poster-upload-heading" className="text-xl font-semibold">
             Poster {required ? <span className="text-danger">*</span> : null}
           </h2>
-          <p className="mt-1 text-sm text-text-muted">
+          <p id="poster-upload-help" className="mt-1 text-sm text-text-muted">
             JPG, JPEG, PNG, or WebP. The backend defines no file-size limit.
           </p>
         </div>
@@ -158,7 +158,7 @@ export function PosterUpload({
             <span>
               <ImagePlus className="mx-auto size-8" aria-hidden="true" />
               <span className="mt-3 block font-semibold">Choose or drop a poster</span>
-              <span id="poster-upload-help" className="mt-1 block text-sm">
+              <span className="mt-1 block text-sm">
                 The image will be cropped to a stable 2:3 frame without stretching.
               </span>
             </span>

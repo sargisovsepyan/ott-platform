@@ -5,6 +5,7 @@ import { PageContainer } from "../../components/layout/PageContainer";
 import { Button } from "../../components/ui/Button";
 import { FormField } from "../../components/ui/FormField";
 import { Input } from "../../components/ui/Input";
+import { PasswordInput } from "../../components/ui/PasswordInput";
 import { useAuth } from "../../hooks/useAuth";
 
 function validate(values) {
@@ -111,10 +112,9 @@ export function RegisterPage() {
           </FormField>
           <FormField id="password" label="Password" required error={errors.password}>
             {({ describedBy, invalid }) => (
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
                 autoComplete="new-password"
                 value={values.password}
                 onChange={handleChange}

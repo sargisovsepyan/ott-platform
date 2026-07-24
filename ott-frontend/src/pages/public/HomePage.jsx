@@ -63,7 +63,17 @@ export function HomePage() {
             <Skeleton className="mt-4 h-6 w-4/5 max-w-xl" />
             <Skeleton className="mt-8 h-12 w-40" />
           </div>
-          <Skeleton className="mx-auto aspect-[2/3] w-full max-w-sm" />
+          <div className="mx-auto grid w-full max-w-xl grid-cols-3 items-center gap-2 sm:gap-3">
+            {Array.from({ length: 3 }, (_, index) => (
+              <Skeleton
+                key={index}
+                className={[
+                  "aspect-[2/3]",
+                  index === 1 ? "" : "mt-8 sm:mt-12",
+                ].join(" ")}
+              />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -93,6 +103,20 @@ export function HomePage() {
       </PageContainer>
     );
   }
+
+  const heroMovieCandidates = [featuredMovie, ...state.topRated, ...state.newest]
+    .filter(
+      (movie, index, movies) =>
+        movies.findIndex((candidate) => candidate.id === movie.id) === index,
+    )
+    .slice(0, 3);
+  const heroMovies =
+    heroMovieCandidates.length === 3
+      ? [heroMovieCandidates[1], heroMovieCandidates[0], heroMovieCandidates[2]]
+      : heroMovieCandidates;
+  const featuredIndex = heroMovies.findIndex(
+    (movie) => movie.id === featuredMovie.id,
+  );
 
   return (
     <div className="pb-16">
@@ -126,14 +150,39 @@ export function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="relative mx-auto w-full max-w-sm md:max-w-md">
-            <PosterImage
-              src={featuredMovie.poster}
-              title={featuredMovie.title}
-              loading="eager"
-              sizes="(min-width: 768px) 40vw, 80vw"
-              className="border-border-strong"
-            />
+          <div
+            className={[
+              "mx-auto grid w-full items-center gap-2 sm:gap-3",
+              heroMovies.length === 1
+                ? "max-w-xs grid-cols-1"
+                : heroMovies.length === 2
+                  ? "max-w-md grid-cols-2"
+                  : "max-w-xl grid-cols-3",
+            ].join(" ")}
+            aria-label="Featured movie poster collection"
+          >
+            {heroMovies.map((movie, index) => (
+              <div
+                key={movie.id}
+                className={
+                  index === featuredIndex
+                    ? "relative z-10"
+                    : "mt-8 opacity-80 sm:mt-12"
+                }
+              >
+                <PosterImage
+                  src={movie.poster}
+                  title={movie.title}
+                  loading="eager"
+                  sizes="(min-width: 768px) 16vw, 28vw"
+                  className={
+                    index === featuredIndex
+                      ? "border-primary"
+                      : "border-border-strong"
+                  }
+                />
+              </div>
+            ))}
           </div>
         </PageContainer>
       </section>

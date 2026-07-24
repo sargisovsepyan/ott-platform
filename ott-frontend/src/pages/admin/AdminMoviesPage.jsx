@@ -65,6 +65,7 @@ export function AdminMoviesPage() {
   const [requestKey, setRequestKey] = useState(0);
   const [state, setState] = useState({
     status: "loading",
+    queryKey: "",
     movies: [],
     total: 0,
     totalPages: 0,
@@ -74,6 +75,8 @@ export function AdminMoviesPage() {
   const [deleteError, setDeleteError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const retry = useCallback(() => setRequestKey((value) => value + 1), []);
+  const queryKey = [search, page, requestKey].join("|");
+  const displayStatus = state.queryKey === queryKey ? state.status : "loading";
 
   const setQuery = useCallback(
     (changes) => {
@@ -103,6 +106,7 @@ export function AdminMoviesPage() {
         }
         setState({
           status: "success",
+          queryKey,
           movies: data.movies,
           total: data.total,
           totalPages: data.totalPages,
@@ -114,12 +118,13 @@ export function AdminMoviesPage() {
           setState((current) => ({
             ...current,
             status: "error",
+            queryKey,
             error: error.message,
           }));
         }
       });
     return () => controller.abort();
-  }, [page, requestKey, search, setQuery]);
+  }, [page, requestKey, search, setQuery, queryKey]);
 
   const handleDelete = async () => {
     if (!selectedMovie) {
@@ -153,7 +158,7 @@ export function AdminMoviesPage() {
             Movie management
           </h1>
           <p className="mt-3 text-text-muted" aria-live="polite">
-            {state.status === "success"
+            {displayStatus === "success"
               ? `${state.total} ${state.total === 1 ? "movie" : "movies"}`
               : "Loading catalogue"}
           </p>
@@ -176,21 +181,21 @@ export function AdminMoviesPage() {
         />
       </div>
       <div className="mt-8">
-        {state.status === "loading" ? (
+        {displayStatus === "loading" ? (
           <div className="grid gap-3">
             {Array.from({ length: 6 }, (_, index) => (
               <Skeleton key={index} className="h-24" />
             ))}
           </div>
         ) : null}
-        {state.status === "error" ? (
+        {displayStatus === "error" ? (
           <ErrorState
             title="Movie management could not load"
             message={state.error}
             onRetry={retry}
           />
         ) : null}
-        {state.status === "success" && !state.movies.length ? (
+        {displayStatus === "success" && !state.movies.length ? (
           <EmptyState
             title={search ? "No managed movies match" : "No movies yet"}
             message={
@@ -211,7 +216,7 @@ export function AdminMoviesPage() {
             }
           />
         ) : null}
-        {state.status === "success" && state.movies.length ? (
+        {displayStatus === "success" && state.movies.length ? (
           <>
             <div className="hidden overflow-x-auto rounded-md border border-border lg:block">
               <table className="w-full border-collapse text-left">
@@ -276,7 +281,7 @@ export function AdminMoviesPage() {
           </>
         ) : null}
       </div>
-      {state.status === "success" ? (
+      {displayStatus === "success" ? (
         <div className="mt-10">
           <Pagination
             currentPage={page}
