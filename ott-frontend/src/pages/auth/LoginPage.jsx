@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Alert } from "../../components/feedback/Alert";
-import { PageContainer } from "../../components/layout/PageContainer";
+import { AuthPageShell } from "../../components/layout/AuthPageShell";
 import { Button } from "../../components/ui/Button";
 import { FormField } from "../../components/ui/FormField";
 import { Input } from "../../components/ui/Input";
@@ -67,13 +67,22 @@ export function LoginPage() {
   };
 
   return (
-    <PageContainer className="grid min-h-[70svh] place-items-center py-12">
-      <section className="w-full max-w-md rounded-md border border-border bg-surface p-5 sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-primary-hover">
-          Welcome back
+    <AuthPageShell
+      eyebrow="Welcome back"
+      title="Log in to Lumio"
+      description="Continue your movie discovery session."
+      footer={
+        <p className="text-sm text-text-muted">
+          New to Lumio?{" "}
+          <Link
+            className="font-semibold text-primary-hover hover:underline"
+            to="/register"
+          >
+            Create an account
+          </Link>
         </p>
-        <h1 className="mt-3 text-3xl font-semibold">Log in to Lumio</h1>
-        <p className="mt-3 text-text-muted">Continue your movie discovery session.</p>
+      }
+    >
         {location.state?.message ? (
           <Alert tone="success" className="mt-6">
             {location.state.message}
@@ -116,13 +125,6 @@ export function LoginPage() {
             Log in
           </Button>
         </form>
-        <p className="mt-6 text-sm text-text-muted">
-          New to Lumio?{" "}
-          <Link className="font-semibold text-primary-hover hover:underline" to="/register">
-            Create an account
-          </Link>
-        </p>
-      </section>
-    </PageContainer>
+    </AuthPageShell>
   );
 }

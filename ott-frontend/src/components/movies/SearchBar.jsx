@@ -6,7 +6,7 @@ export function SearchBar({ value, onChange, onClear }) {
   return (
     <div className="relative">
       <Search
-        className="pointer-events-none absolute left-3.5 top-1/2 size-5 -translate-y-1/2 text-text-subtle"
+        className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-primary-hover"
         aria-hidden="true"
       />
       <Input
@@ -15,7 +15,7 @@ export function SearchBar({ value, onChange, onClear }) {
         onChange={(event) => onChange(event.target.value)}
         placeholder="Search by title"
         aria-label="Search movies by title"
-        className="pl-11 pr-12"
+        className="min-h-14 rounded-lg border-border-strong/80 bg-background-elevated/90 pl-12 pr-12 text-base shadow-card focus:bg-surface-raised"
       />
       {value ? (
         <IconButton

@@ -332,6 +332,114 @@
     pointer-events: none;
   }
 
+  .catalogue-intro {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background:
+      radial-gradient(circle at 85% 15%, rgb(82 121 231 / 16%), transparent 26rem),
+      linear-gradient(135deg, rgb(20 27 40 / 88%), rgb(8 12 20 / 94%));
+    box-shadow: var(--shadow-panel);
+  }
+
+  .catalogue-intro::after {
+    position: absolute;
+    top: -9rem;
+    right: -6rem;
+    z-index: -1;
+    width: 22rem;
+    aspect-ratio: 1;
+    border: 1px solid rgb(145 182 255 / 8%);
+    border-radius: 50%;
+    box-shadow: inset 0 0 5rem rgb(119 101 214 / 7%);
+    content: "";
+  }
+
+  .details-page {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .details-page::before {
+    position: absolute;
+    inset: -5rem 0 auto;
+    z-index: -1;
+    height: 40rem;
+    background:
+      radial-gradient(circle at 18% 28%, rgb(82 121 231 / 16%), transparent 27rem),
+      radial-gradient(circle at 86% 10%, rgb(119 101 214 / 10%), transparent 25rem);
+    content: "";
+    pointer-events: none;
+  }
+
+  .auth-visual {
+    background:
+      radial-gradient(circle at 24% 22%, rgb(82 121 231 / 25%), transparent 22rem),
+      radial-gradient(circle at 82% 76%, rgb(119 101 214 / 22%), transparent 23rem),
+      linear-gradient(145deg, var(--color-surface-raised), var(--color-background));
+  }
+
+  .auth-visual::before {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      118deg,
+      transparent 0 28px,
+      rgb(255 255 255 / 1.8%) 28px 29px
+    );
+    content: "";
+    pointer-events: none;
+  }
+
+  .auth-frame-stage {
+    position: relative;
+    width: min(100%, 31rem);
+    height: 19rem;
+    margin-inline: auto;
+  }
+
+  .auth-frame {
+    position: absolute;
+    top: 1rem;
+    display: grid;
+    width: 34%;
+    aspect-ratio: 2 / 3;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 11%);
+    border-radius: var(--radius-md);
+    background:
+      radial-gradient(circle at 28% 22%, rgb(111 145 242 / 28%), transparent 38%),
+      linear-gradient(145deg, var(--color-surface-raised), var(--color-background-elevated));
+    color: rgb(248 248 245 / 42%);
+    box-shadow: var(--shadow-card);
+  }
+
+  .auth-frame-left {
+    left: 4%;
+    transform: rotate(-6deg) scale(0.9);
+    opacity: 0.58;
+  }
+
+  .auth-frame-center {
+    top: 0;
+    left: 50%;
+    z-index: 2;
+    transform: translateX(-50%);
+    border-color: rgb(111 145 242 / 42%);
+    color: var(--color-text);
+    font-size: 4rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .auth-frame-right {
+    right: 4%;
+    transform: rotate(6deg) scale(0.9);
+    opacity: 0.58;
+  }
+
   @keyframes copy-reveal {
     from {
       transform: translateY(14px);

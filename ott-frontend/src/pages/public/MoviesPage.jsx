@@ -168,13 +168,17 @@ export function MoviesPage() {
 
   return (
     <PageContainer className="page-section">
-      <p className="text-xs font-semibold uppercase tracking-[0.1em] text-primary-hover">
-        Catalogue
-      </p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-[-0.02em] sm:text-5xl">
-        Movies
-      </h1>
-      <div className="mt-8 grid gap-4">
+      <header className="catalogue-intro rounded-lg px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
+        <p className="page-eyebrow">Curated catalogue</p>
+        <h1 className="mt-3 text-balance text-4xl font-semibold tracking-[-0.03em] sm:text-5xl lg:text-6xl">
+          Find your next film
+        </h1>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
+          Search the full Lumio collection, refine the results, and discover
+          something worth watching.
+        </p>
+      </header>
+      <div className="mt-7 grid gap-4 sm:mt-8">
         <DebouncedCatalogueSearch
           key={catalogueState.search}
           value={catalogueState.search}
@@ -187,8 +191,8 @@ export function MoviesPage() {
           hasActiveFilters={hasActiveFilters}
         />
       </div>
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-        <p className="m-0 text-sm text-text-muted" aria-live="polite">
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-5">
+        <p className="m-0 text-sm font-medium text-text-muted" aria-live="polite">
           {displayStatus === "success"
             ? `${result.total} ${result.total === 1 ? "movie" : "movies"}`
             : "Loading catalogue"}
@@ -196,7 +200,7 @@ export function MoviesPage() {
         <label className="flex items-center gap-2 text-sm font-medium text-text-muted">
           Per page
           <Select
-            className="min-h-10 w-24"
+            className="min-h-11 w-24 bg-surface/80"
             value={catalogueState.limit}
             onChange={(event) => handleFilterChange("limit", event.target.value)}
           >
@@ -206,7 +210,7 @@ export function MoviesPage() {
           </Select>
         </label>
       </div>
-      <div className="mt-7">
+      <div className="mt-8">
         {displayStatus === "loading" ? <MovieGridSkeleton /> : null}
         {displayStatus === "error" ? (
           <ErrorState
@@ -237,7 +241,7 @@ export function MoviesPage() {
         ) : null}
       </div>
       {displayStatus === "success" ? (
-        <div className="mt-10">
+        <div className="mt-12">
           <Pagination
             currentPage={catalogueState.page}
             totalPages={result.totalPages}

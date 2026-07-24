@@ -22,7 +22,10 @@ export function Pagination({ currentPage, totalPages, onPageChange }) {
   }
 
   return (
-    <nav className="flex items-center justify-center gap-1" aria-label="Pagination">
+    <nav
+      className="mx-auto flex w-fit max-w-full items-center justify-center gap-1 rounded-lg border border-border/75 bg-surface/70 p-1.5 shadow-card"
+      aria-label="Pagination"
+    >
       <IconButton
         label="Previous page"
         disabled={currentPage <= 1}
@@ -40,7 +43,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }) {
             key={item}
             type="button"
             className={[
-              "size-11 rounded-md border text-sm font-semibold transition-colors duration-[140ms] ease-out",
+              "size-11 rounded-md border text-sm font-semibold tabular-nums transition-colors duration-[180ms] ease-out",
               item === currentPage
                 ? "border-primary bg-primary-soft text-text"
                 : "border-transparent text-text-muted hover:border-border hover:bg-surface-hover hover:text-text",

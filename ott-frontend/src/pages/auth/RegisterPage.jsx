@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Alert } from "../../components/feedback/Alert";
-import { PageContainer } from "../../components/layout/PageContainer";
+import { AuthPageShell } from "../../components/layout/AuthPageShell";
 import { Button } from "../../components/ui/Button";
 import { FormField } from "../../components/ui/FormField";
 import { Input } from "../../components/ui/Input";
@@ -67,15 +67,22 @@ export function RegisterPage() {
   };
 
   return (
-    <PageContainer className="grid min-h-[70svh] place-items-center py-12">
-      <section className="w-full max-w-md rounded-md border border-border bg-surface p-5 sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-primary-hover">
-          Create an account
+    <AuthPageShell
+      eyebrow="Create an account"
+      title="Join Lumio"
+      description="Create an account, then log in to continue."
+      footer={
+        <p className="text-sm text-text-muted">
+          Already registered?{" "}
+          <Link
+            className="font-semibold text-primary-hover hover:underline"
+            to="/login"
+          >
+            Log in
+          </Link>
         </p>
-        <h1 className="mt-3 text-3xl font-semibold">Join Lumio</h1>
-        <p className="mt-3 text-text-muted">
-          Create an account, then log in to continue.
-        </p>
+      }
+    >
         {requestError ? (
           <Alert tone="error" className="mt-6">
             {requestError}
@@ -127,13 +134,6 @@ export function RegisterPage() {
             Create account
           </Button>
         </form>
-        <p className="mt-6 text-sm text-text-muted">
-          Already registered?{" "}
-          <Link className="font-semibold text-primary-hover hover:underline" to="/login">
-            Log in
-          </Link>
-        </p>
-      </section>
-    </PageContainer>
+    </AuthPageShell>
   );
 }

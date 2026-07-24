@@ -45,8 +45,8 @@ export function MovieDetailsPage() {
 
   if (state.status === "loading") {
     return (
-      <PageContainer className="page-section">
-        <div className="grid gap-8 md:grid-cols-[minmax(240px,0.38fr)_1fr] lg:gap-14">
+      <PageContainer className="details-page page-section">
+        <div className="panel-surface grid gap-8 rounded-lg p-5 sm:p-8 md:grid-cols-[minmax(240px,0.38fr)_1fr] lg:gap-14 lg:p-10">
           <Skeleton className="aspect-[2/3] w-full max-w-sm" />
           <div className="pt-4">
             <Skeleton className="h-4 w-28" />
@@ -79,29 +79,30 @@ export function MovieDetailsPage() {
   const { movie } = state;
 
   return (
-    <PageContainer className="page-section">
+    <PageContainer className="details-page page-section">
       <Link
         to="/movies"
-        className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-text-muted hover:text-text"
+        className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-text-muted transition-colors duration-[180ms] hover:bg-surface-hover hover:text-text"
       >
         <ArrowLeft className="size-4" aria-hidden="true" />
         Back to movies
       </Link>
-      <article className="mt-6 grid gap-8 md:grid-cols-[minmax(240px,0.34fr)_1fr] lg:gap-14">
-        <PosterImage
-          src={movie.poster}
-          title={movie.title}
-          loading="eager"
-          sizes="(min-width: 768px) 32vw, 80vw"
-          className="w-full max-w-sm"
-        />
-        <div className="md:pt-5">
+      <article className="panel-surface mt-5 grid gap-8 overflow-hidden rounded-lg p-5 sm:p-8 md:grid-cols-[minmax(240px,0.34fr)_1fr] lg:gap-14 lg:p-10">
+        <div className="mx-auto w-full max-w-sm md:mx-0">
+          <PosterImage
+            src={movie.poster}
+            title={movie.title}
+            year={movie.year}
+            loading="eager"
+            sizes="(min-width: 768px) 32vw, 80vw"
+            className="w-full rounded-lg border-border-strong/80 shadow-panel"
+          />
+        </div>
+        <div className="self-center md:py-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-primary-hover">
-                Movie
-              </p>
-              <h1 className="mt-3 text-balance text-4xl font-semibold tracking-[-0.025em] sm:text-5xl lg:text-6xl">
+              <p className="page-eyebrow">Lumio feature</p>
+              <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight tracking-[-0.035em] sm:text-5xl lg:text-6xl">
                 {movie.title}
               </h1>
             </div>
@@ -118,7 +119,7 @@ export function MovieDetailsPage() {
           <div className="mt-5 max-w-lg">
             <MovieMetadata movie={movie} />
           </div>
-          <section className="mt-9 max-w-3xl" aria-labelledby="description-heading">
+          <section className="mt-9 max-w-3xl border-t border-border/70 pt-8" aria-labelledby="description-heading">
             <h2 id="description-heading" className="text-2xl font-semibold">
               About
             </h2>
