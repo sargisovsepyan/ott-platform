@@ -79,16 +79,20 @@ export function PosterUpload({
 
   return (
     <section aria-labelledby="poster-upload-heading">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 id="poster-upload-heading" className="text-xl font-semibold">
             Poster {required ? <span className="text-danger">*</span> : null}
           </h2>
           <p id="poster-upload-help" className="mt-1 text-sm text-text-muted">
-            JPG, JPEG, PNG, or WebP. The backend defines no file-size limit.
+            JPG, JPEG, PNG, or WebP. No maximum file size is configured.
           </p>
         </div>
-        <Button variant="secondary" onClick={() => inputRef.current?.click()}>
+        <Button
+          variant="secondary"
+          className="w-full sm:w-auto"
+          onClick={() => inputRef.current?.click()}
+        >
           {selectedFile ? (
             <Replace className="size-4" aria-hidden="true" />
           ) : (
@@ -107,36 +111,46 @@ export function PosterUpload({
       />
       <div
         className={[
-          "mt-4 rounded-md border bg-surface p-4 transition-colors duration-[140ms] ease-out",
-          isDragging ? "border-primary bg-primary-soft" : "border-border",
+          "mt-5 rounded-lg border bg-surface/55 p-4 transition-[background-color,border-color,box-shadow] duration-[180ms] ease-out sm:p-5",
+          isDragging
+            ? "border-primary bg-primary-soft/60 shadow-glow"
+            : "border-border/80",
         ].join(" ")}
         onDragEnter={(event) => {
           event.preventDefault();
           setIsDragging(true);
         }}
         onDragOver={(event) => event.preventDefault()}
-        onDragLeave={() => setIsDragging(false)}
+        onDragLeave={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setIsDragging(false);
+          }
+        }}
         onDrop={handleDrop}
       >
         {previewUrl || currentPoster ? (
           <div className="grid gap-5 sm:grid-cols-2">
             {currentPoster ? (
-              <div>
-                <p className="mb-2 text-sm font-semibold text-text-muted">Current</p>
+              <div className="rounded-md border border-border/70 bg-background-elevated/70 p-4">
+                <p className="mb-3 text-sm font-semibold text-text-muted">
+                  Current poster
+                </p>
                 <PosterImage
                   src={currentPoster}
                   title={movieTitle}
-                  className="max-w-60"
+                  className="mx-auto max-w-56 rounded-md shadow-card"
                 />
               </div>
             ) : null}
             {previewUrl ? (
-              <div>
-                <p className="mb-2 text-sm font-semibold text-text-muted">Selected</p>
+              <div className="rounded-md border border-primary/35 bg-primary-soft/25 p-4">
+                <p className="mb-3 text-sm font-semibold text-text">
+                  Proposed poster
+                </p>
                 <PosterImage
                   src={previewUrl}
                   title={`${movieTitle} preview`}
-                  className="max-w-60"
+                  className="mx-auto max-w-56 rounded-md shadow-card"
                 />
                 <p className="mt-3 break-all text-sm font-medium">{selectedFile.name}</p>
                 <p className="mt-1 text-sm text-text-muted">
@@ -152,13 +166,15 @@ export function PosterUpload({
         ) : (
           <button
             type="button"
-            className="grid min-h-52 w-full place-items-center rounded-sm border border-dashed border-border-strong px-5 text-center text-text-muted hover:border-primary hover:text-text"
+            className="grid min-h-64 w-full place-items-center rounded-md border border-dashed border-border-strong bg-background-elevated/45 px-5 text-center text-text-muted transition-[background-color,border-color,color] duration-[180ms] hover:border-primary hover:bg-primary-soft/25 hover:text-text"
             onClick={() => inputRef.current?.click()}
           >
             <span>
-              <ImagePlus className="mx-auto size-8" aria-hidden="true" />
-              <span className="mt-3 block font-semibold">Choose or drop a poster</span>
-              <span className="mt-1 block text-sm">
+              <span className="mx-auto grid size-14 place-items-center rounded-full border border-primary/35 bg-primary-soft text-primary-hover">
+                <ImagePlus className="size-6" aria-hidden="true" />
+              </span>
+              <span className="mt-4 block font-semibold">Choose or drop a poster</span>
+              <span className="mt-2 block text-sm">
                 The image will be cropped to a stable 2:3 frame without stretching.
               </span>
             </span>

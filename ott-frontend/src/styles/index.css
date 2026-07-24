@@ -440,6 +440,29 @@
     opacity: 0.58;
   }
 
+  .admin-intro {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background:
+      radial-gradient(circle at 88% 20%, rgb(74 169 191 / 12%), transparent 22rem),
+      linear-gradient(135deg, rgb(20 27 40 / 90%), rgb(8 12 20 / 95%));
+    box-shadow: var(--shadow-panel);
+  }
+
+  .admin-intro::after {
+    position: absolute;
+    top: -7rem;
+    right: 4%;
+    z-index: -1;
+    width: 17rem;
+    aspect-ratio: 1;
+    border: 1px solid rgb(145 182 255 / 7%);
+    border-radius: 50%;
+    content: "";
+  }
+
   @keyframes copy-reveal {
     from {
       transform: translateY(14px);

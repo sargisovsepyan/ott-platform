@@ -46,16 +46,17 @@ export function CreateMoviePage() {
 
   return (
     <PageContainer className="page-section">
-      <p className="text-xs font-semibold uppercase tracking-[0.1em] text-primary-hover">
-        Administration
-      </p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-[-0.02em]">
-        Add a movie
-      </h1>
-      <p className="mt-4 max-w-2xl text-text-muted">
-        Add catalogue metadata and the required poster in one request.
-      </p>
-      <div className="mt-10 max-w-4xl rounded-md border border-border bg-surface p-5 sm:p-8">
+      <header className="admin-intro rounded-lg px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
+        <p className="page-eyebrow">Catalogue editor</p>
+        <h1 className="mt-3 text-balance text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
+          Add a movie
+        </h1>
+        <p className="mt-4 max-w-2xl text-text-muted">
+          Shape a complete catalogue entry with clear metadata and a portrait
+          poster.
+        </p>
+      </header>
+      <div className="panel-surface mt-8 rounded-lg p-4 sm:p-6 lg:p-8">
         <MovieForm
           submitLabel="Create movie"
           onSubmit={handleSubmit}

@@ -94,113 +94,139 @@ export function MovieForm({
           {requestError}
         </Alert>
       ) : null}
-      <p className="m-0 text-sm text-text-muted">
-        Fields marked with <span className="text-danger">*</span> are required.
-      </p>
-      <div className="grid gap-5 md:grid-cols-2">
-        <FormField
-          id="movie-title"
-          label="Title"
-          required
-          error={errors.title}
-          hint={`${values.title.length}/150 characters`}
-          className="md:col-span-2"
+      <div
+        className={[
+          "grid gap-6",
+          children
+            ? "xl:grid-cols-[minmax(0,1.18fr)_minmax(20rem,0.82fr)] xl:items-start"
+            : "",
+        ].join(" ")}
+      >
+        <section
+          className="rounded-lg border border-border/75 bg-background-elevated/55 p-5 sm:p-6"
+          aria-labelledby="movie-information-heading"
         >
-          {({ describedBy, invalid }) => (
-            <Input
+          <div className="mb-6 border-b border-border/70 pb-5">
+            <h2 id="movie-information-heading" className="text-xl font-semibold">
+              Movie information
+            </h2>
+            <p className="mt-2 text-sm text-text-muted">
+              Fields marked with <span className="text-danger">*</span> are required.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            <FormField
               id="movie-title"
-              name="title"
-              value={values.title}
-              onChange={handleChange}
-              maxLength="150"
-              aria-describedby={describedBy}
-              invalid={invalid}
-            />
-          )}
-        </FormField>
-        <FormField id="movie-year" label="Year" required error={errors.year}>
-          {({ describedBy, invalid }) => (
-            <Input
-              id="movie-year"
-              name="year"
-              type="number"
-              min="1888"
-              max={maximumYear}
-              step="1"
-              value={values.year}
-              onChange={handleChange}
-              aria-describedby={describedBy}
-              invalid={invalid}
-            />
-          )}
-        </FormField>
-        <FormField id="movie-rating" label="Rating" error={errors.rating}>
-          {({ describedBy, invalid }) => (
-            <Input
-              id="movie-rating"
-              name="rating"
-              type="number"
-              min="0"
-              max="10"
-              step="0.1"
-              value={values.rating}
-              onChange={handleChange}
-              placeholder="0"
-              aria-describedby={describedBy}
-              invalid={invalid}
-            />
-          )}
-        </FormField>
-        <FormField
-          id="movie-genre"
-          label="Genre"
-          required
-          error={errors.genre}
-          className="md:col-span-2"
-        >
-          {({ describedBy, invalid }) => (
-            <Input
+              label="Title"
+              required
+              error={errors.title}
+              hint={`${values.title.length}/150 characters`}
+              className="md:col-span-2"
+            >
+              {({ describedBy, invalid }) => (
+                <Input
+                  id="movie-title"
+                  name="title"
+                  value={values.title}
+                  onChange={handleChange}
+                  maxLength="150"
+                  aria-describedby={describedBy}
+                  invalid={invalid}
+                />
+              )}
+            </FormField>
+            <FormField id="movie-year" label="Year" required error={errors.year}>
+              {({ describedBy, invalid }) => (
+                <Input
+                  id="movie-year"
+                  name="year"
+                  type="number"
+                  min="1888"
+                  max={maximumYear}
+                  step="1"
+                  value={values.year}
+                  onChange={handleChange}
+                  aria-describedby={describedBy}
+                  invalid={invalid}
+                />
+              )}
+            </FormField>
+            <FormField id="movie-rating" label="Rating" error={errors.rating}>
+              {({ describedBy, invalid }) => (
+                <Input
+                  id="movie-rating"
+                  name="rating"
+                  type="number"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={values.rating}
+                  onChange={handleChange}
+                  placeholder="0"
+                  aria-describedby={describedBy}
+                  invalid={invalid}
+                />
+              )}
+            </FormField>
+            <FormField
               id="movie-genre"
-              name="genre"
-              value={values.genre}
-              onChange={handleChange}
-              aria-describedby={describedBy}
-              invalid={invalid}
-            />
-          )}
-        </FormField>
-        <FormField
-          id="movie-description"
-          label="Description"
-          error={errors.description}
-          hint={`${values.description.length}/2000 characters`}
-          className="md:col-span-2"
-        >
-          {({ describedBy, invalid }) => (
-            <Textarea
+              label="Genre"
+              required
+              error={errors.genre}
+              className="md:col-span-2"
+            >
+              {({ describedBy, invalid }) => (
+                <Input
+                  id="movie-genre"
+                  name="genre"
+                  value={values.genre}
+                  onChange={handleChange}
+                  aria-describedby={describedBy}
+                  invalid={invalid}
+                />
+              )}
+            </FormField>
+            <FormField
               id="movie-description"
-              name="description"
-              value={values.description}
-              onChange={handleChange}
-              maxLength="2000"
-              aria-describedby={describedBy}
-              invalid={invalid}
-            />
-          )}
-        </FormField>
+              label="Description"
+              error={errors.description}
+              hint={`${values.description.length}/2000 characters`}
+              className="md:col-span-2"
+            >
+              {({ describedBy, invalid }) => (
+                <Textarea
+                  id="movie-description"
+                  name="description"
+                  value={values.description}
+                  onChange={handleChange}
+                  maxLength="2000"
+                  aria-describedby={describedBy}
+                  invalid={invalid}
+                />
+              )}
+            </FormField>
+          </div>
+        </section>
+        {children ? (
+          <div className="rounded-lg border border-border/75 bg-background-elevated/55 p-5 sm:p-6">
+            {children}
+          </div>
+        ) : null}
       </div>
-      {children}
       <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end">
         {isSubmitting ? (
-          <Button variant="secondary" disabled>
+          <Button variant="secondary" className="w-full sm:w-auto" disabled>
             Cancel
           </Button>
         ) : (
-          <Link to={cancelHref} className={buttonClassName("secondary")}>
+          <Link
+            to={cancelHref}
+            className={buttonClassName("secondary", "w-full sm:w-auto")}
+          >
             Cancel
           </Link>
         )}
-        <Button type="submit" isLoading={isSubmitting}>
+        <Button type="submit" isLoading={isSubmitting} className="w-full sm:w-auto">
           {submitLabel}
         </Button>
       </div>
