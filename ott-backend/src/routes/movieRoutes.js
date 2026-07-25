@@ -7,6 +7,7 @@ const adminMiddleware = require("../middlewares/adminMiddleware");
 const validateMovie = require("../middlewares/validateMovie");
 const validateMovieQuery = require("../middlewares/validateMovieQuery");
 const upload = require("../middlewares/upload");
+const uploadVideo = require("../middlewares/uploadVideo");
 
 const {
     createMovie,
@@ -14,6 +15,8 @@ const {
     getMovieById,
     updateMovie,
     updateMoviePoster,
+    updateMoviePreviewVideo,
+    deleteMoviePreviewVideo,
     deleteMovie,
 } = require("../controllers/movieController");
 
@@ -407,6 +410,167 @@ router.patch(
     adminMiddleware,
     upload.single("poster"),
     updateMoviePoster
+);
+
+
+// Загружает или заменяет превью-видео фильма.
+
+/**
+ * @swagger
+ * /api/movies/{id}/preview-video:
+ *   patch:
+ *     summary: Upload or replace movie preview video
+ *     description: Uploads or replaces the custom preview video of a movie. Available only to administrators.
+ *     tags:
+ *       - Movies
+ *
+ *     security:
+ *       - BearerAuth: []
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Movie ID.
+ *
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - previewVideo
+ *             properties:
+ *               previewVideo:
+ *                 type: string
+ *                 format: binary
+ *                 description: MP4 preview video.
+ *
+ *     responses:
+ *       200:
+ *         description: Preview video uploaded successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Movie'
+ *
+ *       400:
+ *         description: Preview video is required.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       401:
+ *         description: Authentication token is missing or invalid.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       403:
+ *         description: Administrator access is required.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       404:
+ *         description: Movie not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.patch(
+    "/:id/preview-video",
+    authMiddleware,
+    adminMiddleware,
+    uploadVideo.single("previewVideo"),
+    updateMoviePreviewVideo
+);
+
+
+// Удаляет индивидуальное превью-видео фильма.
+
+/**
+ * @swagger
+ * /api/movies/{id}/preview-video:
+ *   delete:
+ *     summary: Delete movie preview video
+ *     description: Deletes the custom preview video and restores the default preview video. Available only to administrators.
+ *     tags:
+ *       - Movies
+ *
+ *     security:
+ *       - BearerAuth: []
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Movie ID.
+ *
+ *     responses:
+ *       200:
+ *         description: Custom preview video deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Movie'
+ *
+ *       400:
+ *         description: The movie does not have a custom preview video.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       401:
+ *         description: Authentication token is missing or invalid.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       403:
+ *         description: Administrator access is required.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       404:
+ *         description: Movie not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.delete(
+    "/:id/preview-video",
+    authMiddleware,
+    adminMiddleware,
+    deleteMoviePreviewVideo
 );
 
 /**

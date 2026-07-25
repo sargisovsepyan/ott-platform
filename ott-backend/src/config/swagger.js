@@ -65,6 +65,14 @@ const options = {
                             example: "https://res.cloudinary.com/your-cloud/image/upload/example.jpg",
                         },
 
+                        previewVideoUrl: {
+                            type: "string",
+                            nullable: true,
+                            example: "https://res.cloudinary.com/your-cloud/video/upload/example.mp4",
+                            description:
+                                "Custom movie preview URL or the default preview URL when a custom video is unavailable.",
+                        },
+
                         createdAt: {
                             type: "string",
                             format: "date-time",

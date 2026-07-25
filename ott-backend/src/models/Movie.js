@@ -1,5 +1,33 @@
 const mongoose = require("mongoose");
 
+const previewVideoSchema = new mongoose.Schema(
+    {
+        url: {
+            type: String,
+            trim: true,
+        },
+
+        publicId: {
+            type: String,
+            trim: true,
+        },
+
+        durationSeconds: {
+            type: Number,
+            min: 0,
+        },
+
+        format: {
+            type: String,
+            trim: true,
+            lowercase: true,
+        },
+    },
+    {
+        _id: false,
+    }
+);
+
 const movieSchema = new mongoose.Schema(
     {
         title: {
@@ -39,6 +67,10 @@ const movieSchema = new mongoose.Schema(
         poster: {
             type: String,
             required: true,
+        },
+        previewVideo: {
+            type: previewVideoSchema,
+            default: undefined,
         },
     },
     {

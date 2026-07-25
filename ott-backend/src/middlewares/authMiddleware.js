@@ -39,7 +39,7 @@ const authMiddleware = (req, res, next) => {
         req.user = decoded;
 
         return next();
-    } catch (error) { // Если токен недействителен или срок его действия истёк — запрещаем доступ
+    } catch { // Если токен недействителен или срок его действия истёк — запрещаем доступ
         return res.status(401).json({
             message: "Invalid or expired token",
         });
