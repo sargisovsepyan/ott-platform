@@ -1,16 +1,31 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
+import { createMovieDetailState } from "../../utils/movieNavigation";
 import { MovieMetadata } from "./MovieMetadata";
 import { PosterImage } from "./PosterImage";
 
 export function MovieCard({ movie, className = "" }) {
+  const location = useLocation();
+  const detailState = createMovieDetailState(location);
+
   return (
     <article className={["group min-w-0", className].join(" ")}>
       <Link
         to={`/movies/${movie.id}`}
-        className="motion-lift block h-full rounded-lg border border-border/75 bg-surface/65 p-2 pb-3 shadow-card transition-[background-color,border-color,box-shadow,transform] duration-[220ms] ease-out hover:-translate-y-1 hover:border-border-strong hover:bg-surface-raised/80 hover:shadow-panel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:translate-y-0"
+        state={detailState}
+        className="motion-lift block h-full cursor-pointer rounded-lg border border-border/75 bg-surface/65 p-2 pb-3 shadow-card transition-[background-color,border-color,box-shadow,transform] duration-[220ms] ease-out hover:-translate-y-1 hover:border-border-strong hover:bg-surface-raised/80 hover:shadow-panel focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus active:translate-y-0"
+        onKeyDown={(event) => {
+          if (
+            (event.key === " " || event.key === "Enter") &&
+            !event.repeat
+          ) {
+            event.preventDefault();
+            event.currentTarget.click();
+          }
+        }}
       >
         <PosterImage
           src={movie.poster}
+          version={movie.updatedAt}
           title={movie.title}
           year={movie.year}
           sizes="(min-width: 1536px) 190px, (min-width: 1280px) 18vw, (min-width: 768px) 25vw, 46vw"

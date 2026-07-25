@@ -7,6 +7,7 @@ import { FormField } from "../../components/ui/FormField";
 import { Input } from "../../components/ui/Input";
 import { PasswordInput } from "../../components/ui/PasswordInput";
 import { useAuth } from "../../hooks/useAuth";
+import { TOP_SCROLL_STATE } from "../../utils/scrollNavigation";
 
 function validate(values) {
   const errors = {};
@@ -77,6 +78,7 @@ export function LoginPage() {
           <Link
             className="font-semibold text-primary-hover hover:underline"
             to="/register"
+            state={TOP_SCROLL_STATE}
           >
             Create an account
           </Link>

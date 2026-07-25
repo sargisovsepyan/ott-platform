@@ -4,6 +4,7 @@ import { NavLink, Link as RouterLink, useLocation } from "react-router";
 import { IconButton } from "../ui/IconButton";
 import { buttonClassName } from "../ui/buttonStyles";
 import { useAuth } from "../../hooks/useAuth";
+import { TOP_SCROLL_STATE } from "../../utils/scrollNavigation";
 import { MobileNavigation } from "./MobileNavigation";
 import { PageContainer } from "./PageContainer";
 
@@ -41,6 +42,7 @@ export function AppHeader() {
         <PageContainer className="flex h-full items-center justify-between gap-5">
           <RouterLink
             to="/"
+            state={TOP_SCROLL_STATE}
             className="group inline-flex min-h-11 items-center gap-2.5 text-lg font-bold tracking-[0.14em] text-text"
             aria-label="Lumio home"
           >
@@ -55,6 +57,7 @@ export function AppHeader() {
               <NavLink
                 key={link.to}
                 to={link.to}
+                state={TOP_SCROLL_STATE}
                 end={link.end}
                 className={({ isActive }) =>
                   [
@@ -71,6 +74,7 @@ export function AppHeader() {
             {isAdmin ? (
               <NavLink
                 to="/admin/movies"
+                state={TOP_SCROLL_STATE}
                 className={({ isActive }) =>
                   [
                     "relative flex h-full items-center text-sm font-semibold transition-colors duration-[140ms] ease-out",
@@ -88,6 +92,7 @@ export function AppHeader() {
           <div className="ml-auto hidden min-w-0 items-center justify-end gap-2 lg:flex">
             <RouterLink
               to="/movies"
+              state={TOP_SCROLL_STATE}
               className="inline-flex size-11 items-center justify-center rounded-md border border-transparent text-text-muted transition-colors duration-[140ms] ease-out hover:border-border hover:bg-surface-hover hover:text-text"
               aria-label="Search movies"
             >
@@ -104,10 +109,18 @@ export function AppHeader() {
               </>
             ) : (
               <>
-                <RouterLink to="/login" className={buttonClassName("ghost")}>
+                <RouterLink
+                  to="/login"
+                  state={TOP_SCROLL_STATE}
+                  className={buttonClassName("ghost")}
+                >
                   Log in
                 </RouterLink>
-                <RouterLink to="/register" className={buttonClassName("secondary")}>
+                <RouterLink
+                  to="/register"
+                  state={TOP_SCROLL_STATE}
+                  className={buttonClassName("secondary")}
+                >
                   Register
                 </RouterLink>
               </>

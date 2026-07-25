@@ -65,6 +65,7 @@ export function CreateMoviePage() {
         >
           <PosterUpload
             required
+            disabled={isSubmitting}
             onFileChange={(file) => {
               setPoster(file);
               setPosterError("");

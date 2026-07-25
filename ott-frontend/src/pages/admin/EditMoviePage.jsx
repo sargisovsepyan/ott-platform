@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useLocation, useParams } from "react-router";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import {
   getMovie,
@@ -14,6 +14,7 @@ import { PosterUpload } from "../../components/forms/PosterUpload";
 import { PageContainer } from "../../components/layout/PageContainer";
 import { Button } from "../../components/ui/Button";
 import { buttonClassName } from "../../components/ui/buttonStyles";
+import { createMovieDetailState } from "../../utils/movieNavigation";
 
 function getRequestMessage(error) {
   return error.errors?.length
@@ -23,6 +24,7 @@ function getRequestMessage(error) {
 
 export function EditMoviePage() {
   const { id } = useParams();
+  const location = useLocation();
   const [requestKey, setRequestKey] = useState(0);
   const [state, setState] = useState({
     status: "loading",
@@ -66,6 +68,10 @@ export function EditMoviePage() {
   };
 
   const handlePosterSubmit = async () => {
+    if (isSavingPoster) {
+      return;
+    }
+
     if (!selectedPoster) {
       setPosterError("Choose a new poster before updating.");
       return;
@@ -82,7 +88,7 @@ export function EditMoviePage() {
       setState({ status: "success", movie, error: "" });
       setSelectedPoster(null);
       setPosterResetKey((value) => value + 1);
-      setSuccessMessage("The poster was replaced.");
+      setSuccessMessage("The new poster was uploaded and saved.");
     } catch (error) {
       setPosterError(getRequestMessage(error));
     } finally {
@@ -151,7 +157,9 @@ export function EditMoviePage() {
           <PosterUpload
             key={posterResetKey}
             currentPoster={movie.poster}
+            currentPosterVersion={movie.updatedAt}
             movieTitle={movie.title}
+            disabled={isSavingPoster}
             onFileChange={(file) => {
               setSelectedPoster(file);
               setPosterError("");
@@ -162,6 +170,7 @@ export function EditMoviePage() {
             <Button
               onClick={handlePosterSubmit}
               isLoading={isSavingPoster}
+              disabled={!selectedPoster || isSavingPoster}
               className="w-full sm:w-auto"
             >
               Update poster
@@ -172,6 +181,7 @@ export function EditMoviePage() {
       <div className="mt-8 flex justify-end">
         <Link
           to={`/movies/${movie.id}`}
+          state={createMovieDetailState(location, "Back to movie editor")}
           className={buttonClassName("ghost")}
         >
           <ExternalLink className="size-4" aria-hidden="true" />

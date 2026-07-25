@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { NavLink } from "react-router";
 import { X } from "lucide-react";
+import { TOP_SCROLL_STATE } from "../../utils/scrollNavigation";
 import { IconButton } from "../ui/IconButton";
 
 const links = [
@@ -94,6 +95,7 @@ export function MobileNavigation({
             <NavLink
               key={link.to}
               to={link.to}
+              state={TOP_SCROLL_STATE}
               end={link.end}
               onClick={onClose}
               className={({ isActive }) =>
@@ -109,6 +111,7 @@ export function MobileNavigation({
           {isAdmin ? (
             <NavLink
               to="/admin/movies"
+              state={TOP_SCROLL_STATE}
               onClick={onClose}
               className={({ isActive }) =>
                 [
@@ -140,6 +143,7 @@ export function MobileNavigation({
             <>
               <NavLink
                 to="/login"
+                state={TOP_SCROLL_STATE}
                 onClick={onClose}
                 className="flex min-h-14 items-center border-b border-border/80 text-lg font-semibold text-text-muted transition-colors duration-[140ms] ease-out hover:text-text"
               >
@@ -147,6 +151,7 @@ export function MobileNavigation({
               </NavLink>
               <NavLink
                 to="/register"
+                state={TOP_SCROLL_STATE}
                 onClick={onClose}
                 className="flex min-h-14 items-center border-b border-border/80 text-lg font-semibold text-text-muted transition-colors duration-[140ms] ease-out hover:text-text"
               >

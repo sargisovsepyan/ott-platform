@@ -1,5 +1,14 @@
-import { Clapperboard, Compass, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Clapperboard } from "lucide-react";
+import { getMovies } from "../../api/moviesApi";
+import { PosterImage } from "../movies/PosterImage";
 import { PageContainer } from "./PageContainer";
+
+const AUTH_POSTER_SLOTS = [
+  { position: "left", movieIndex: 1 },
+  { position: "center", movieIndex: 0 },
+  { position: "right", movieIndex: 2 },
+];
 
 export function AuthPageShell({
   eyebrow,
@@ -8,28 +17,59 @@ export function AuthPageShell({
   children,
   footer,
 }) {
+  const [featuredMovies, setFeaturedMovies] = useState([]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getMovies(
+      { sort: "-rating", page: 1, limit: 12 },
+      { signal: controller.signal },
+    )
+      .then((result) => {
+        setFeaturedMovies(
+          result.movies.filter((movie) => movie.poster).slice(0, 3),
+        );
+      })
+      .catch(() => {
+        // The poster composition is decorative and must never block authentication.
+      });
+
+    return () => controller.abort();
+  }, []);
+
   return (
     <PageContainer className="flex min-h-[calc(100svh-7.5rem)] items-center py-8 sm:py-12 lg:min-h-[calc(100svh-9rem)]">
       <div className="panel-surface grid w-full overflow-hidden rounded-lg lg:grid-cols-[minmax(0,1.08fr)_minmax(24rem,0.92fr)]">
-        <aside className="auth-visual relative hidden min-h-[39rem] overflow-hidden border-r border-border/80 p-10 lg:flex lg:flex-col lg:justify-between xl:p-14">
-          <div className="relative z-10">
-            <p className="flex items-center gap-2 text-sm font-bold tracking-[0.16em] text-text">
-              <span className="grid size-9 place-items-center rounded-md border border-primary/55 bg-primary-soft text-primary-hover">
-                <Clapperboard className="size-4.5" aria-hidden="true" />
-              </span>
-              LUMIO
-            </p>
-          </div>
-          <div className="auth-frame-stage" aria-hidden="true">
-            <div className="auth-frame auth-frame-left">
-              <Compass className="size-7" />
-            </div>
-            <div className="auth-frame auth-frame-center">
-              <span>L</span>
-            </div>
-            <div className="auth-frame auth-frame-right">
-              <Sparkles className="size-7" />
-            </div>
+        <aside className="auth-visual relative hidden min-h-[39rem] overflow-hidden border-r border-border/80 p-10 lg:flex lg:flex-col lg:justify-center lg:gap-8 xl:p-14">
+          <div className="auth-poster-stage" aria-hidden="true">
+            {AUTH_POSTER_SLOTS.map(({ position, movieIndex }) => {
+              const movie = featuredMovies[movieIndex];
+
+              return (
+                <div
+                  key={position}
+                  className={`auth-poster auth-poster-${position}`}
+                >
+                  {movie ? (
+                    <PosterImage
+                      src={movie.poster}
+                      version={movie.updatedAt}
+                      title={movie.title}
+                      year={movie.year}
+                      loading={position === "center" ? "eager" : "lazy"}
+                      sizes="(min-width: 1280px) 180px, 150px"
+                      decorative
+                      className="auth-poster-media"
+                    />
+                  ) : (
+                    <div className="auth-poster-fallback">
+                      <Clapperboard className="size-8" aria-hidden="true" />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
           <div className="relative z-10 max-w-lg">
             <p className="page-eyebrow">Your next discovery</p>

@@ -14,8 +14,23 @@ function getInitials(title) {
     .toUpperCase();
 }
 
+function getVersionedSource(src, version) {
+  if (
+    !src ||
+    !version ||
+    src.startsWith("blob:") ||
+    src.startsWith("data:")
+  ) {
+    return src;
+  }
+
+  const separator = src.includes("?") ? "&" : "?";
+  return `${src}${separator}lumioVersion=${encodeURIComponent(version)}`;
+}
+
 export function PosterImage({
   src,
+  version,
   title,
   year,
   className = "",
@@ -25,8 +40,9 @@ export function PosterImage({
   decorative = false,
 }) {
   const [failedSource, setFailedSource] = useState("");
+  const imageSource = getVersionedSource(src, version);
   const fallbackLabel = title ? `No poster available for ${title}` : "No poster available";
-  const showFallback = !src || failedSource === src;
+  const showFallback = !imageSource || failedSource === imageSource;
 
   return (
     <div
@@ -37,7 +53,7 @@ export function PosterImage({
     >
       {!showFallback ? (
         <img
-          src={src}
+          src={imageSource}
           alt={decorative ? "" : `Poster for ${title}`}
           loading={loading}
           sizes={sizes}
@@ -45,14 +61,7 @@ export function PosterImage({
             "absolute inset-0 size-full object-cover",
             imageClassName,
           ].join(" ")}
-          onError={() => setFailedSource(src)}
-          onLoad={(event) => {
-            const ratio =
-              event.currentTarget.naturalWidth / event.currentTarget.naturalHeight;
-            if (!Number.isFinite(ratio) || ratio < 0.45 || ratio > 0.85) {
-              setFailedSource(src);
-            }
-          }}
+          onError={() => setFailedSource(imageSource)}
         />
       ) : null}
       {showFallback ? (

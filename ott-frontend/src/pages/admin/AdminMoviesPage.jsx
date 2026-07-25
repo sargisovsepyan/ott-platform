@@ -270,6 +270,7 @@ export function AdminMoviesPage() {
                         <div className="flex items-center gap-4">
                           <PosterImage
                             src={movie.poster}
+                            version={movie.updatedAt}
                             title={movie.title}
                             year={movie.year}
                             className="w-12 shrink-0 rounded-md"
@@ -301,6 +302,7 @@ export function AdminMoviesPage() {
                 >
                   <PosterImage
                     src={movie.poster}
+                    version={movie.updatedAt}
                     title={movie.title}
                     year={movie.year}
                     className="w-20 rounded-md shadow-card"

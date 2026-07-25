@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import { getMovies } from "../../api/moviesApi";
+import { getMovieFilterOptions, getMovies } from "../../api/moviesApi";
 import { EmptyState } from "../../components/feedback/EmptyState";
 import { ErrorState } from "../../components/feedback/ErrorState";
 import { PageContainer } from "../../components/layout/PageContainer";
@@ -13,6 +13,11 @@ import { SORT_OPTIONS } from "../../components/movies/movieFilterOptions";
 import { Button } from "../../components/ui/Button";
 import { Select } from "../../components/ui/Select";
 import { useDebouncedValue } from "../../hooks/useDebouncedValue";
+import {
+  CATALOGUE_RESULTS_ID,
+  createPositionScrollState,
+  createSectionScrollState,
+} from "../../utils/scrollNavigation";
 
 const validSorts = new Set(SORT_OPTIONS.map((option) => option.value));
 const validLimits = new Set([12, 24, 48]);
@@ -38,20 +43,27 @@ function getCatalogueState(searchParams) {
 }
 
 function DebouncedCatalogueSearch({ value, onSearch }) {
-  const [draft, setDraft] = useState(value);
+  const [draftState, setDraftState] = useState({
+    sourceValue: value,
+    draft: value,
+  });
+  const draft =
+    draftState.sourceValue === value ? draftState.draft : value;
   const debouncedSearch = useDebouncedValue(draft);
 
   useEffect(() => {
-    if (debouncedSearch !== value) {
+    if (debouncedSearch === draft && debouncedSearch !== value) {
       onSearch(debouncedSearch);
     }
-  }, [debouncedSearch, onSearch, value]);
+  }, [debouncedSearch, draft, onSearch, value]);
 
   return (
     <SearchBar
       value={draft}
-      onChange={setDraft}
-      onClear={() => setDraft("")}
+      onChange={(nextDraft) =>
+        setDraftState({ sourceValue: value, draft: nextDraft })
+      }
+      onClear={() => setDraftState({ sourceValue: value, draft: "" })}
     />
   );
 }
@@ -71,6 +83,11 @@ export function MoviesPage() {
     totalPages: 0,
     error: "",
   });
+  const [filterOptions, setFilterOptions] = useState({
+    status: "loading",
+    years: [],
+    genres: [],
+  });
   const queryKey = [
     catalogueState.search,
     catalogueState.year,
@@ -80,10 +97,15 @@ export function MoviesPage() {
     catalogueState.limit,
     requestKey,
   ].join("|");
-  const displayStatus = result.queryKey === queryKey ? result.status : "loading";
+  const isRefreshing =
+    result.status === "success" &&
+    Boolean(result.queryKey) &&
+    result.queryKey !== queryKey;
+  const displayStatus =
+    result.queryKey === queryKey || isRefreshing ? result.status : "loading";
 
   const updateParams = useCallback(
-    (changes, replace = false) => {
+    (changes, replace = false, scrollState) => {
       const next = new URLSearchParams(searchParams);
       Object.entries(changes).forEach(([key, value]) => {
         if (value === "" || value === undefined || value === null) {
@@ -92,10 +114,63 @@ export function MoviesPage() {
           next.set(key, String(value));
         }
       });
-      setSearchParams(next, { replace });
+      setSearchParams(next, {
+        replace,
+        state:
+          scrollState ?? createPositionScrollState(window.scrollY),
+        preventScrollReset: true,
+      });
     },
     [searchParams, setSearchParams],
   );
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getMovieFilterOptions({ signal: controller.signal })
+      .then((options) => {
+        setFilterOptions({ status: "success", ...options });
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          setFilterOptions({ status: "error", years: [], genres: [] });
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    if (filterOptions.status !== "success") {
+      return;
+    }
+
+    const changes = {};
+    const requestedYear = searchParams.get("year")?.trim() ?? "";
+    const requestedGenre = searchParams.get("genre")?.trim() ?? "";
+    if (
+      requestedYear &&
+      !filterOptions.years.includes(Number(requestedYear))
+    ) {
+      changes.year = "";
+    }
+
+    if (requestedGenre) {
+      const canonicalGenre = filterOptions.genres.find(
+        (genre) =>
+          genre.toLocaleLowerCase() === requestedGenre.toLocaleLowerCase(),
+      );
+      if (!canonicalGenre) {
+        changes.genre = "";
+      } else if (canonicalGenre !== requestedGenre) {
+        changes.genre = canonicalGenre;
+      }
+    }
+
+    if (Object.keys(changes).length) {
+      updateParams({ ...changes, page: 1 }, true);
+    }
+  }, [filterOptions, searchParams, updateParams]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -156,6 +231,10 @@ export function MoviesPage() {
   const resetFilters = () => {
     setSearchParams(
       catalogueState.limit === 12 ? {} : { limit: catalogueState.limit },
+      {
+        state: createPositionScrollState(window.scrollY),
+        preventScrollReset: true,
+      },
     );
   };
 
@@ -180,20 +259,27 @@ export function MoviesPage() {
       </header>
       <div className="mt-7 grid gap-4 sm:mt-8">
         <DebouncedCatalogueSearch
-          key={catalogueState.search}
           value={catalogueState.search}
           onSearch={(search) => updateParams({ search, page: 1 }, true)}
         />
         <FilterToolbar
           filters={catalogueState}
+          years={filterOptions.years}
+          genres={filterOptions.genres}
+          optionsStatus={filterOptions.status}
           onChange={handleFilterChange}
           onReset={resetFilters}
           hasActiveFilters={hasActiveFilters}
         />
       </div>
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-5">
+      <div
+        id={CATALOGUE_RESULTS_ID}
+        className="mt-8 flex scroll-mt-24 flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-5"
+      >
         <p className="m-0 text-sm font-medium text-text-muted" aria-live="polite">
-          {displayStatus === "success"
+          {isRefreshing
+            ? "Updating catalogue"
+            : displayStatus === "success"
             ? `${result.total} ${result.total === 1 ? "movie" : "movies"}`
             : "Loading catalogue"}
         </p>
@@ -210,7 +296,7 @@ export function MoviesPage() {
           </Select>
         </label>
       </div>
-      <div className="mt-8">
+      <div className="mt-8" aria-busy={isRefreshing || undefined}>
         {displayStatus === "loading" ? <MovieGridSkeleton /> : null}
         {displayStatus === "error" ? (
           <ErrorState
@@ -246,8 +332,11 @@ export function MoviesPage() {
             currentPage={catalogueState.page}
             totalPages={result.totalPages}
             onPageChange={(page) => {
-              updateParams({ page });
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              updateParams(
+                { page },
+                false,
+                createSectionScrollState(CATALOGUE_RESULTS_ID),
+              );
             }}
           />
         </div>

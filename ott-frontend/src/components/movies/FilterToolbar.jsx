@@ -1,11 +1,18 @@
 import { useId, useState } from "react";
 import { RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
 import { SORT_OPTIONS } from "./movieFilterOptions";
 
-export function FilterToolbar({ filters, onChange, onReset, hasActiveFilters }) {
+export function FilterToolbar({
+  filters,
+  years,
+  genres,
+  optionsStatus,
+  onChange,
+  onReset,
+  hasActiveFilters,
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const panelId = useId();
   const activeCount = [
@@ -42,25 +49,43 @@ export function FilterToolbar({ filters, onChange, onReset, hasActiveFilters }) 
       >
         <label className="grid gap-2 text-sm font-semibold">
           Year
-          <Input
-            type="number"
-            min="1888"
-            max={new Date().getFullYear() + 5}
+          <Select
             value={filters.year}
             onChange={(event) => onChange("year", event.target.value)}
-            placeholder="Any year"
-            className={filters.year ? "border-primary/70 bg-primary-soft/45" : ""}
-          />
+            disabled={optionsStatus !== "success"}
+            className={
+              filters.year
+                ? "border-primary/70 bg-primary-soft/45"
+                : "text-text-muted"
+            }
+          >
+            <option value="">Any year</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </Select>
         </label>
         <label className="grid gap-2 text-sm font-semibold">
           Genre
-          <Input
-            type="text"
+          <Select
             value={filters.genre}
             onChange={(event) => onChange("genre", event.target.value)}
-            placeholder="Exact genre"
-            className={filters.genre ? "border-primary/70 bg-primary-soft/45" : ""}
-          />
+            disabled={optionsStatus !== "success"}
+            className={
+              filters.genre
+                ? "border-primary/70 bg-primary-soft/45"
+                : "text-text-muted"
+            }
+          >
+            <option value="">Any genre</option>
+            {genres.map((genre) => (
+              <option key={genre} value={genre}>
+                {genre}
+              </option>
+            ))}
+          </Select>
         </label>
         <label className="grid gap-2 text-sm font-semibold">
           Sort
@@ -92,6 +117,13 @@ export function FilterToolbar({ filters, onChange, onReset, hasActiveFilters }) 
           </Button>
         </div>
       </div>
+      <p className="sr-only" role="status">
+        {optionsStatus === "loading"
+          ? "Loading available years and genres"
+          : optionsStatus === "success"
+            ? `${years.length} years and ${genres.length} genres available`
+            : "Available years and genres could not be loaded"}
+      </p>
     </section>
   );
 }

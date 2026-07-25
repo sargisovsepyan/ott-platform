@@ -70,6 +70,59 @@ export async function getMovie(id, { signal } = {}) {
   return movie;
 }
 
+export async function getAllMovies(params = {}, { signal } = {}) {
+  const query = { ...params };
+  delete query.page;
+  delete query.limit;
+
+  const firstPage = await getMovies(
+    { ...query, page: 1, limit: 100 },
+    { signal },
+  );
+  const remainingPages =
+    firstPage.totalPages > 1
+      ? await Promise.all(
+          Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+            getMovies(
+              { ...query, page: index + 2, limit: 100 },
+              { signal },
+            ),
+          ),
+        )
+      : [];
+
+  return [
+    ...firstPage.movies,
+    ...remainingPages.flatMap((page) => page.movies),
+  ];
+}
+
+export async function getMovieFilterOptions({ signal } = {}) {
+  const movies = await getAllMovies({ sort: "-year" }, { signal });
+  const years = [
+    ...new Set(
+      movies
+        .map((movie) => movie.year)
+        .filter((year) => Number.isInteger(year) && year > 0),
+    ),
+  ].sort((first, second) => second - first);
+  const genresByKey = new Map();
+
+  movies.forEach((movie) => {
+    const genre = typeof movie.genre === "string" ? movie.genre.trim() : "";
+    if (genre && !genresByKey.has(genre.toLocaleLowerCase())) {
+      genresByKey.set(genre.toLocaleLowerCase(), genre);
+    }
+  });
+
+  return {
+    years,
+    genres: [...genresByKey.values()].sort((first, second) =>
+      first.localeCompare(second, undefined, { sensitivity: "base" }),
+    ),
+  };
+}
+
 export async function createMovie(formData, { signal } = {}) {
   const data = await apiRequest("/movies", {
     method: "POST",

@@ -14,36 +14,36 @@ function formatFileSize(bytes) {
 
 export function PosterUpload({
   currentPoster,
+  currentPosterVersion,
   movieTitle = "movie",
   required = false,
   onFileChange,
   error,
+  disabled = false,
 }) {
   const inputRef = useRef(null);
-  const objectUrlRef = useRef("");
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState("");
+  const [selection, setSelection] = useState(null);
   const [localError, setLocalError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const selectedFile = selection?.file ?? null;
+  const previewUrl = selection?.url ?? "";
 
-  useEffect(
-    () => () => {
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(objectUrlRef.current);
+  useEffect(() => {
+    const objectUrl = selection?.url;
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
       }
-    },
-    [],
-  );
+    };
+  }, [selection]);
 
   const setFile = (file) => {
-    if (objectUrlRef.current) {
-      URL.revokeObjectURL(objectUrlRef.current);
-      objectUrlRef.current = "";
+    if (disabled) {
+      return;
     }
 
     if (!file) {
-      setSelectedFile(null);
-      setPreviewUrl("");
+      setSelection(null);
       setLocalError("");
       onFileChange(null);
       if (inputRef.current) {
@@ -53,8 +53,7 @@ export function PosterUpload({
     }
 
     if (!acceptedTypes.has(file.type)) {
-      setSelectedFile(null);
-      setPreviewUrl("");
+      setSelection(null);
       setLocalError("Choose a JPG, JPEG, PNG, or WebP image.");
       onFileChange(null);
       if (inputRef.current) {
@@ -64,9 +63,7 @@ export function PosterUpload({
     }
 
     const objectUrl = URL.createObjectURL(file);
-    objectUrlRef.current = objectUrl;
-    setSelectedFile(file);
-    setPreviewUrl(objectUrl);
+    setSelection({ file, url: objectUrl });
     setLocalError("");
     onFileChange(file);
   };
@@ -74,6 +71,9 @@ export function PosterUpload({
   const handleDrop = (event) => {
     event.preventDefault();
     setIsDragging(false);
+    if (disabled) {
+      return;
+    }
     setFile(event.dataTransfer.files?.[0] ?? null);
   };
 
@@ -91,6 +91,7 @@ export function PosterUpload({
         <Button
           variant="secondary"
           className="w-full sm:w-auto"
+          disabled={disabled}
           onClick={() => inputRef.current?.click()}
         >
           {selectedFile ? (
@@ -106,6 +107,7 @@ export function PosterUpload({
         type="file"
         accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
         className="sr-only"
+        disabled={disabled}
         onChange={(event) => setFile(event.target.files?.[0] ?? null)}
         aria-describedby="poster-upload-help"
       />
@@ -116,9 +118,12 @@ export function PosterUpload({
             ? "border-primary bg-primary-soft/60 shadow-glow"
             : "border-border/80",
         ].join(" ")}
+        aria-disabled={disabled || undefined}
         onDragEnter={(event) => {
           event.preventDefault();
-          setIsDragging(true);
+          if (!disabled) {
+            setIsDragging(true);
+          }
         }}
         onDragOver={(event) => event.preventDefault()}
         onDragLeave={(event) => {
@@ -137,6 +142,7 @@ export function PosterUpload({
                 </p>
                 <PosterImage
                   src={currentPoster}
+                  version={currentPosterVersion}
                   title={movieTitle}
                   className="mx-auto max-w-56 rounded-md shadow-card"
                 />
@@ -156,7 +162,12 @@ export function PosterUpload({
                 <p className="mt-1 text-sm text-text-muted">
                   {formatFileSize(selectedFile.size)}
                 </p>
-                <Button variant="ghost" className="mt-2" onClick={() => setFile(null)}>
+                <Button
+                  variant="ghost"
+                  className="mt-2"
+                  disabled={disabled}
+                  onClick={() => setFile(null)}
+                >
                   <Trash2 className="size-4" aria-hidden="true" />
                   Remove
                 </Button>
@@ -167,6 +178,7 @@ export function PosterUpload({
           <button
             type="button"
             className="grid min-h-64 w-full place-items-center rounded-md border border-dashed border-border-strong bg-background-elevated/45 px-5 text-center text-text-muted transition-[background-color,border-color,color] duration-[140ms] ease-out hover:border-primary hover:bg-primary-soft/25 hover:text-text"
+            disabled={disabled}
             onClick={() => inputRef.current?.click()}
           >
             <span>

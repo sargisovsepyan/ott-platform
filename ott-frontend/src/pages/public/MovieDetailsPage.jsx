@@ -1,39 +1,124 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useParams } from "react-router";
 import { ArrowLeft, Pencil } from "lucide-react";
-import { getMovie } from "../../api/moviesApi";
+import { getAllMovies, getMovie } from "../../api/moviesApi";
 import { ErrorState } from "../../components/feedback/ErrorState";
 import { Skeleton } from "../../components/feedback/Skeleton";
 import { PageContainer } from "../../components/layout/PageContainer";
 import { MovieMetadata } from "../../components/movies/MovieMetadata";
+import { MovieRow } from "../../components/movies/MovieRow";
 import { PosterImage } from "../../components/movies/PosterImage";
 import { buttonClassName } from "../../components/ui/buttonStyles";
 import { useAuth } from "../../hooks/useAuth";
+import {
+  getMovieOriginHref,
+  getMovieReturnOrigin,
+} from "../../utils/movieNavigation";
+import {
+  createRestoreScrollState,
+  createTopScrollState,
+} from "../../utils/scrollNavigation";
+
+function normalizeGenre(value) {
+  return typeof value === "string"
+    ? value.trim().replace(/\s+/g, " ").toLocaleLowerCase()
+    : "";
+}
+
+function compareRelatedMovies(first, second) {
+  return (
+    second.rating - first.rating ||
+    second.year - first.year ||
+    first.title.localeCompare(second.title, undefined, { sensitivity: "base" })
+  );
+}
+
+function getRelatedMovies(movie, catalogue) {
+  const genre = normalizeGenre(movie.genre);
+  const available = catalogue
+    .filter((candidate) => candidate.id !== movie.id)
+    .filter(
+      (candidate, index, collection) =>
+        collection.findIndex((item) => item.id === candidate.id) === index,
+    )
+    .sort(compareRelatedMovies);
+  const sameGenre = genre
+    ? available.filter((candidate) => normalizeGenre(candidate.genre) === genre)
+    : [];
+  const related = sameGenre.slice(0, 6);
+
+  if (related.length < 3) {
+    available.forEach((candidate) => {
+      if (
+        related.length < 6 &&
+        !related.some((movieCandidate) => movieCandidate.id === candidate.id)
+      ) {
+        related.push(candidate);
+      }
+    });
+  }
+
+  return related;
+}
 
 export function MovieDetailsPage() {
   const { id } = useParams();
+  const location = useLocation();
   const { isAdmin } = useAuth();
   const [requestKey, setRequestKey] = useState(0);
   const [state, setState] = useState({
     status: "loading",
+    movieId: "",
     movie: null,
+    catalogue: [],
     error: "",
     statusCode: 0,
   });
   const retry = useCallback(() => setRequestKey((value) => value + 1), []);
+  const displayStatus = state.movieId === id ? state.status : "loading";
+  const returnOrigin = getMovieReturnOrigin(location.state);
+  const relatedMovies = useMemo(
+    () =>
+      state.movie && state.movieId === id
+        ? getRelatedMovies(state.movie, state.catalogue)
+        : [],
+    [id, state.catalogue, state.movie, state.movieId],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
 
-    getMovie(id, { signal: controller.signal })
-      .then((movie) => {
-        setState({ status: "success", movie, error: "", statusCode: 0 });
+    const catalogueRequest = getAllMovies(
+      { sort: "-rating" },
+      { signal: controller.signal },
+    ).catch((error) => {
+      if (error.name === "AbortError") {
+        throw error;
+      }
+      return [];
+    });
+
+    Promise.all([
+      getMovie(id, { signal: controller.signal }),
+      catalogueRequest,
+    ])
+      .then(([movie, catalogue]) => {
+        setState({
+          status: "success",
+          movieId: id,
+          movie,
+          catalogue,
+          error: "",
+          statusCode: 0,
+        });
       })
       .catch((error) => {
         if (error.name !== "AbortError") {
           setState({
             status: "error",
+            movieId: id,
             movie: null,
+            catalogue: [],
             error: error.message,
             statusCode: error.status,
           });
@@ -43,7 +128,7 @@ export function MovieDetailsPage() {
     return () => controller.abort();
   }, [id, requestKey]);
 
-  if (state.status === "loading") {
+  if (displayStatus === "loading") {
     return (
       <PageContainer className="details-page page-section">
         <div className="panel-surface grid gap-8 rounded-lg p-5 sm:p-8 md:grid-cols-[minmax(240px,0.38fr)_1fr] lg:gap-14 lg:p-10">
@@ -59,7 +144,7 @@ export function MovieDetailsPage() {
     );
   }
 
-  if (state.status === "error") {
+  if (displayStatus === "error") {
     const isNotFound = state.statusCode === 404;
     return (
       <PageContainer className="details-page page-section">
@@ -77,58 +162,85 @@ export function MovieDetailsPage() {
   }
 
   const { movie } = state;
+  const relatedSearchParams = new URLSearchParams(
+    movie.genre?.trim()
+      ? { genre: movie.genre.trim(), page: "1" }
+      : { sort: "-rating", page: "1" },
+  );
 
   return (
-    <PageContainer className="details-page page-section">
-      <Link
-        to="/movies"
-        className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-text-muted transition-colors duration-[140ms] ease-out hover:bg-surface-hover hover:text-text"
-      >
-        <ArrowLeft className="size-4" aria-hidden="true" />
-        Back to movies
-      </Link>
-      <article className="panel-surface mt-5 grid gap-8 overflow-hidden rounded-lg p-5 sm:p-8 md:grid-cols-[minmax(240px,0.34fr)_1fr] lg:gap-14 lg:p-10">
-        <div className="mx-auto w-full max-w-sm md:mx-0">
-          <PosterImage
-            src={movie.poster}
-            title={movie.title}
-            year={movie.year}
-            loading="eager"
-            sizes="(min-width: 768px) 32vw, 80vw"
-            className="w-full rounded-lg border-border-strong/80 shadow-panel"
+    <div className="details-page page-section">
+      <PageContainer>
+        <Link
+          to={getMovieOriginHref(returnOrigin)}
+          state={
+            returnOrigin.locationKey
+              ? createRestoreScrollState(returnOrigin.locationKey)
+              : createTopScrollState()
+          }
+          className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-sm font-semibold text-text-muted transition-colors duration-[140ms] ease-out hover:bg-surface-hover hover:text-text"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          {returnOrigin.label}
+        </Link>
+        <article className="panel-surface mt-5 grid gap-8 overflow-hidden rounded-lg p-5 sm:p-8 md:grid-cols-[minmax(240px,0.34fr)_1fr] lg:gap-14 lg:p-10">
+          <div className="mx-auto w-full max-w-sm md:mx-0">
+            <PosterImage
+              src={movie.poster}
+              version={movie.updatedAt}
+              title={movie.title}
+              year={movie.year}
+              loading="eager"
+              sizes="(min-width: 768px) 32vw, 80vw"
+              className="w-full rounded-lg border-border-strong/80 shadow-panel"
+            />
+          </div>
+          <div className="self-center md:py-5">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="page-eyebrow">Lumio feature</p>
+                <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight tracking-[-0.035em] sm:text-5xl lg:text-6xl">
+                  {movie.title}
+                </h1>
+              </div>
+              {isAdmin ? (
+                <Link
+                  to={`/admin/movies/${movie.id}/edit`}
+                  className={buttonClassName("secondary")}
+                >
+                  <Pencil className="size-4" aria-hidden="true" />
+                  Edit movie
+                </Link>
+              ) : null}
+            </div>
+            <div className="mt-5 max-w-lg">
+              <MovieMetadata movie={movie} />
+            </div>
+            <section
+              className="mt-9 max-w-3xl border-t border-border/70 pt-8"
+              aria-labelledby="description-heading"
+            >
+              <h2 id="description-heading" className="text-2xl font-semibold">
+                About
+              </h2>
+              <p className="mt-4 text-lg leading-relaxed text-text-muted">
+                {movie.description || "No description available."}
+              </p>
+            </section>
+          </div>
+        </article>
+      </PageContainer>
+      {relatedMovies.length ? (
+        <div className="mt-14 sm:mt-16">
+          <MovieRow
+            eyebrow="Continue discovering"
+            title="More like this"
+            description="Related titles selected from the Lumio catalogue."
+            movies={relatedMovies}
+            viewAllHref={`/movies?${relatedSearchParams.toString()}`}
           />
         </div>
-        <div className="self-center md:py-5">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="page-eyebrow">Lumio feature</p>
-              <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight tracking-[-0.035em] sm:text-5xl lg:text-6xl">
-                {movie.title}
-              </h1>
-            </div>
-            {isAdmin ? (
-              <Link
-                to={`/admin/movies/${movie.id}/edit`}
-                className={buttonClassName("secondary")}
-              >
-                <Pencil className="size-4" aria-hidden="true" />
-                Edit movie
-              </Link>
-            ) : null}
-          </div>
-          <div className="mt-5 max-w-lg">
-            <MovieMetadata movie={movie} />
-          </div>
-          <section className="mt-9 max-w-3xl border-t border-border/70 pt-8" aria-labelledby="description-heading">
-            <h2 id="description-heading" className="text-2xl font-semibold">
-              About
-            </h2>
-            <p className="mt-4 text-lg leading-relaxed text-text-muted">
-              {movie.description || "No description available."}
-            </p>
-          </section>
-        </div>
-      </article>
-    </PageContainer>
+      ) : null}
+    </div>
   );
 }

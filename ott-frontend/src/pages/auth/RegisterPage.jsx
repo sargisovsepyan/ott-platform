@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { Alert } from "../../components/feedback/Alert";
 import { AuthPageShell } from "../../components/layout/AuthPageShell";
 import { Button } from "../../components/ui/Button";
 import { FormField } from "../../components/ui/FormField";
 import { Input } from "../../components/ui/Input";
 import { PasswordInput } from "../../components/ui/PasswordInput";
+import { getMembershipPlan } from "../../data/membershipPlans";
 import { useAuth } from "../../hooks/useAuth";
+import { TOP_SCROLL_STATE } from "../../utils/scrollNavigation";
 
 function validate(values) {
   const errors = {};
@@ -25,6 +27,8 @@ function validate(values) {
 export function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const selectedPlan = getMembershipPlan(searchParams.get("plan"));
   const [values, setValues] = useState({ name: "", email: "", password: "" });
   const [errors, setErrors] = useState({});
   const [requestError, setRequestError] = useState("");
@@ -77,12 +81,32 @@ export function RegisterPage() {
           <Link
             className="font-semibold text-primary-hover hover:underline"
             to="/login"
+            state={TOP_SCROLL_STATE}
           >
             Log in
           </Link>
         </p>
       }
     >
+        {selectedPlan ? (
+          <section
+            className="mt-6 rounded-md border border-primary/35 bg-primary-soft/30 px-4 py-3.5"
+            aria-label="Selected membership plan"
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary-hover">
+              Selected demo plan
+            </p>
+            <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2">
+              <strong className="text-base text-text">{selectedPlan.name}</strong>
+              <span className="text-sm text-text-muted">
+                {selectedPlan.price} {selectedPlan.cadence}
+              </span>
+            </p>
+            <p className="mt-1.5 text-xs leading-relaxed text-text-subtle">
+              Registration remains independent of this product-demo selection.
+            </p>
+          </section>
+        ) : null}
         {requestError ? (
           <Alert tone="error" className="mt-6">
             {requestError}
