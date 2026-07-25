@@ -23,6 +23,10 @@ export function normalizeMovie(movie) {
     description: typeof movie.description === "string" ? movie.description : "",
     rating: normalizeNumber(movie.rating),
     poster: typeof movie.poster === "string" ? movie.poster : "",
+    previewVideoUrl:
+      typeof movie.previewVideoUrl === "string"
+        ? movie.previewVideoUrl.trim()
+        : "",
     createdAt: movie.createdAt ?? null,
     updatedAt: movie.updatedAt ?? null,
   };
@@ -163,6 +167,47 @@ export async function updateMoviePoster(id, formData, { signal } = {}) {
 
   if (!movie) {
     throw new ApiError({ message: "The updated poster response was incomplete." });
+  }
+
+  return movie;
+}
+
+export async function updateMoviePreviewVideo(id, file, { signal } = {}) {
+  const formData = new FormData();
+  formData.append("previewVideo", file);
+  const data = await apiRequest(
+    `/movies/${encodeURIComponent(id)}/preview-video`,
+    {
+      method: "PATCH",
+      body: formData,
+      signal,
+    },
+  );
+  const movie = normalizeMovie(data);
+
+  if (!movie) {
+    throw new ApiError({
+      message: "The updated preview response was incomplete.",
+    });
+  }
+
+  return movie;
+}
+
+export async function deleteMoviePreviewVideo(id, { signal } = {}) {
+  const data = await apiRequest(
+    `/movies/${encodeURIComponent(id)}/preview-video`,
+    {
+      method: "DELETE",
+      signal,
+    },
+  );
+  const movie = normalizeMovie(data);
+
+  if (!movie) {
+    throw new ApiError({
+      message: "The updated preview response was incomplete.",
+    });
   }
 
   return movie;

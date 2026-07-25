@@ -2,19 +2,24 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import {
+  deleteMoviePreviewVideo,
   getMovie,
   updateMovie,
   updateMoviePoster,
+  updateMoviePreviewVideo,
 } from "../../api/moviesApi";
+import { ConfirmDialog } from "../../components/feedback/ConfirmDialog";
 import { ErrorState } from "../../components/feedback/ErrorState";
 import { Skeleton } from "../../components/feedback/Skeleton";
 import { Alert } from "../../components/feedback/Alert";
 import { MovieForm } from "../../components/forms/MovieForm";
 import { PosterUpload } from "../../components/forms/PosterUpload";
+import { PreviewVideoUpload } from "../../components/forms/PreviewVideoUpload";
 import { PageContainer } from "../../components/layout/PageContainer";
 import { Button } from "../../components/ui/Button";
 import { buttonClassName } from "../../components/ui/buttonStyles";
 import { createMovieDetailState } from "../../utils/movieNavigation";
+import { getPreviewVideoUrl } from "../../utils/previewVideo";
 
 function getRequestMessage(error) {
   return error.errors?.length
@@ -33,11 +38,18 @@ export function EditMoviePage() {
   });
   const [metadataError, setMetadataError] = useState("");
   const [posterError, setPosterError] = useState("");
+  const [previewError, setPreviewError] = useState("");
+  const [previewDeleteError, setPreviewDeleteError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedPoster, setSelectedPoster] = useState(null);
+  const [selectedPreviewVideo, setSelectedPreviewVideo] = useState(null);
   const [isSavingMetadata, setIsSavingMetadata] = useState(false);
   const [isSavingPoster, setIsSavingPoster] = useState(false);
+  const [isSavingPreview, setIsSavingPreview] = useState(false);
+  const [isDeletingPreview, setIsDeletingPreview] = useState(false);
+  const [isPreviewDeleteOpen, setIsPreviewDeleteOpen] = useState(false);
   const [posterResetKey, setPosterResetKey] = useState(0);
+  const [previewResetKey, setPreviewResetKey] = useState(0);
   const retry = useCallback(() => setRequestKey((value) => value + 1), []);
 
   useEffect(() => {
@@ -96,6 +108,60 @@ export function EditMoviePage() {
     }
   };
 
+  const handlePreviewSubmit = async () => {
+    if (isSavingPreview || isDeletingPreview) {
+      return;
+    }
+
+    if (!selectedPreviewVideo) {
+      setPreviewError("Choose an MP4 preview before uploading.");
+      return;
+    }
+
+    setIsSavingPreview(true);
+    setPreviewError("");
+    setSuccessMessage("");
+    try {
+      const movie = await updateMoviePreviewVideo(id, selectedPreviewVideo);
+      setState({ status: "success", movie, error: "" });
+      setSelectedPreviewVideo(null);
+      setPreviewResetKey((value) => value + 1);
+      setSuccessMessage("The preview video was uploaded and saved.");
+    } catch (error) {
+      setPreviewError(getRequestMessage(error));
+    } finally {
+      setIsSavingPreview(false);
+    }
+  };
+
+  const handlePreviewDelete = async () => {
+    if (isDeletingPreview || isSavingPreview) {
+      return;
+    }
+
+    setIsDeletingPreview(true);
+    setPreviewDeleteError("");
+    setSuccessMessage("");
+    try {
+      const movie = await deleteMoviePreviewVideo(id);
+      setState({ status: "success", movie, error: "" });
+      setSelectedPreviewVideo(null);
+      setPreviewResetKey((value) => value + 1);
+      setIsPreviewDeleteOpen(false);
+      setSuccessMessage(
+        "The custom preview was removed. The backend-provided default is now active.",
+      );
+    } catch (error) {
+      setPreviewDeleteError(
+        error.status === 400
+          ? "This movie does not have a custom preview video to remove."
+          : getRequestMessage(error),
+      );
+    } finally {
+      setIsDeletingPreview(false);
+    }
+  };
+
   if (state.status === "loading") {
     return (
       <PageContainer className="page-section">
@@ -134,7 +200,8 @@ export function EditMoviePage() {
           Edit {movie.title}
         </h1>
         <p className="mt-4 max-w-2xl text-text-muted">
-          Refine movie information and manage its poster as separate updates.
+          Refine movie information, poster, and preview video as separate
+          updates.
         </p>
       </header>
       {successMessage ? (
@@ -153,30 +220,80 @@ export function EditMoviePage() {
             requestError={metadataError}
           />
         </div>
-        <section className="panel-surface rounded-lg p-5 sm:p-6">
-          <PosterUpload
-            key={posterResetKey}
-            currentPoster={movie.poster}
-            currentPosterVersion={movie.updatedAt}
-            movieTitle={movie.title}
-            disabled={isSavingPoster}
-            onFileChange={(file) => {
-              setSelectedPoster(file);
-              setPosterError("");
-            }}
-            error={posterError}
-          />
-          <div className="mt-6 flex justify-end border-t border-border pt-6">
-            <Button
-              onClick={handlePosterSubmit}
-              isLoading={isSavingPoster}
-              disabled={!selectedPoster || isSavingPoster}
-              className="w-full sm:w-auto"
-            >
-              Update poster
-            </Button>
-          </div>
-        </section>
+        <div className="grid gap-6">
+          <section className="panel-surface rounded-lg p-5 sm:p-6">
+            <PosterUpload
+              key={posterResetKey}
+              currentPoster={movie.poster}
+              currentPosterVersion={movie.updatedAt}
+              movieTitle={movie.title}
+              disabled={isSavingPoster}
+              onFileChange={(file) => {
+                setSelectedPoster(file);
+                setPosterError("");
+              }}
+              error={posterError}
+            />
+            <div className="mt-6 flex justify-end border-t border-border pt-6">
+              <Button
+                onClick={handlePosterSubmit}
+                isLoading={isSavingPoster}
+                disabled={!selectedPoster || isSavingPoster}
+                className="w-full sm:w-auto"
+              >
+                Update poster
+              </Button>
+            </div>
+          </section>
+          <section className="panel-surface rounded-lg p-5 sm:p-6">
+            <PreviewVideoUpload
+              key={previewResetKey}
+              movie={movie}
+              disabled={isSavingPreview || isDeletingPreview}
+              onFileChange={(file) => {
+                setSelectedPreviewVideo(file);
+                setPreviewError("");
+              }}
+              error={previewError}
+            />
+            <p className="mt-5 text-xs leading-relaxed text-text-subtle">
+              The API decides whether this URL is a custom preview or the
+              global default. Remove custom preview will leave that decision to
+              the backend.
+            </p>
+            <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-between">
+              <Button
+                variant="danger"
+                onClick={() => {
+                  setPreviewDeleteError("");
+                  setIsPreviewDeleteOpen(true);
+                }}
+                disabled={
+                  !getPreviewVideoUrl(movie.previewVideoUrl) ||
+                  isSavingPreview ||
+                  isDeletingPreview
+                }
+                className="w-full sm:w-auto"
+              >
+                Remove custom preview
+              </Button>
+              <Button
+                onClick={handlePreviewSubmit}
+                isLoading={isSavingPreview}
+                disabled={
+                  !selectedPreviewVideo ||
+                  isSavingPreview ||
+                  isDeletingPreview
+                }
+                className="w-full sm:w-auto"
+              >
+                {getPreviewVideoUrl(movie.previewVideoUrl)
+                  ? "Replace preview"
+                  : "Upload preview"}
+              </Button>
+            </div>
+          </section>
+        </div>
       </div>
       <div className="mt-8 flex justify-end">
         <Link
@@ -188,6 +305,21 @@ export function EditMoviePage() {
           View public details
         </Link>
       </div>
+      <ConfirmDialog
+        isOpen={isPreviewDeleteOpen}
+        title="Remove custom preview?"
+        message={`Remove the custom preview from ${movie.title}? The backend-provided default preview will be used when available.`}
+        confirmLabel="Remove custom preview"
+        isLoading={isDeletingPreview}
+        error={previewDeleteError}
+        onConfirm={handlePreviewDelete}
+        onClose={() => {
+          if (!isDeletingPreview) {
+            setIsPreviewDeleteOpen(false);
+            setPreviewDeleteError("");
+          }
+        }}
+      />
     </PageContainer>
   );
 }

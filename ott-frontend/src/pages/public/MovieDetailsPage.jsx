@@ -6,6 +6,7 @@ import { ErrorState } from "../../components/feedback/ErrorState";
 import { Skeleton } from "../../components/feedback/Skeleton";
 import { PageContainer } from "../../components/layout/PageContainer";
 import { MovieMetadata } from "../../components/movies/MovieMetadata";
+import { PreviewPlayButton } from "../../components/movies/PreviewPlayButton";
 import { MovieRow } from "../../components/movies/MovieRow";
 import { PosterImage } from "../../components/movies/PosterImage";
 import { buttonClassName } from "../../components/ui/buttonStyles";
@@ -215,6 +216,9 @@ export function MovieDetailsPage() {
             </div>
             <div className="mt-5 max-w-lg">
               <MovieMetadata movie={movie} />
+            </div>
+            <div className="mt-7">
+              <PreviewPlayButton movie={movie} variant="primary" />
             </div>
             <section
               className="mt-9 max-w-3xl border-t border-border/70 pt-8"
