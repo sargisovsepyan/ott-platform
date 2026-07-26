@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loginUser, registerUser } from "../api/authApi";
 import { configureApiClient } from "../api/client";
 import {
@@ -10,25 +10,38 @@ import { AuthContext } from "./authContext";
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(() => readAuthSession());
-  const [isInitializing] = useState(false);
+  const sessionRef = useRef(session);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   const logout = useCallback(() => {
+    sessionRef.current = null;
     clearAuthSession();
     setSession(null);
   }, []);
 
-  useEffect(
-    () =>
-      configureApiClient({
-        getToken: () => session?.token ?? null,
-        onUnauthorized: logout,
-      }),
-    [logout, session?.token],
-  );
+  useEffect(() => {
+    let isActive = true;
+    const resetApiClient = configureApiClient({
+      getToken: () => sessionRef.current?.token ?? null,
+      onUnauthorized: logout,
+    });
+
+    queueMicrotask(() => {
+      if (isActive) {
+        setIsInitializing(false);
+      }
+    });
+
+    return () => {
+      isActive = false;
+      resetApiClient();
+    };
+  }, [logout]);
 
   const login = useCallback(async (credentials, options) => {
     const result = await loginUser(credentials, options);
     const nextSession = { user: result.user, token: result.token };
+    sessionRef.current = nextSession;
     writeAuthSession(nextSession);
     setSession(nextSession);
     return result;

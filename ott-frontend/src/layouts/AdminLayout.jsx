@@ -1,10 +1,11 @@
 import { NavLink, Outlet } from "react-router";
-import { Plus } from "lucide-react";
+import { Plus, UsersRound } from "lucide-react";
 import { PageContainer } from "../components/layout/PageContainer";
 
 const links = [
   { to: "/admin/movies", label: "Manage movies", end: true },
   { to: "/admin/movies/new", label: "Add movie", icon: Plus },
+  { to: "/admin/users", label: "Users", icon: UsersRound },
 ];
 
 export function AdminLayout() {

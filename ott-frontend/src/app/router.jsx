@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router";
 import { PublicLayout } from "../layouts/PublicLayout";
 import { AdminLayout } from "../layouts/AdminLayout";
 import { AdminMoviesPage } from "../pages/admin/AdminMoviesPage";
+import { AdminUsersPage } from "../pages/admin/AdminUsersPage";
 import { CreateMoviePage } from "../pages/admin/CreateMoviePage";
 import { EditMoviePage } from "../pages/admin/EditMoviePage";
 import { LoginPage } from "../pages/auth/LoginPage";
@@ -31,6 +32,7 @@ export function AppRouter() {
             <Route path="admin/movies" element={<AdminMoviesPage />} />
             <Route path="admin/movies/new" element={<CreateMoviePage />} />
             <Route path="admin/movies/:id/edit" element={<EditMoviePage />} />
+            <Route path="admin/users" element={<AdminUsersPage />} />
           </Route>
         </Route>
         <Route path="forbidden" element={<ForbiddenPage />} />
