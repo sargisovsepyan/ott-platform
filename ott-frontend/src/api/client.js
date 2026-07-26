@@ -1,7 +1,9 @@
-const API_BASE = "/api";
+const API_BASE = (
+  import.meta.env.VITE_API_BASE_URL || "/api"
+).replace(/\/+$/, "");
 
 let getAccessToken = () => null;
-let handleUnauthorized = () => {};
+let handleUnauthorized = () => { };
 
 export class ApiError extends Error {
   constructor({ status = 0, message, errors = [], code, data = null }) {
@@ -17,11 +19,11 @@ export class ApiError extends Error {
 export function configureApiClient({ getToken, onUnauthorized }) {
   getAccessToken = typeof getToken === "function" ? getToken : () => null;
   handleUnauthorized =
-    typeof onUnauthorized === "function" ? onUnauthorized : () => {};
+    typeof onUnauthorized === "function" ? onUnauthorized : () => { };
 
   return () => {
     getAccessToken = () => null;
-    handleUnauthorized = () => {};
+    handleUnauthorized = () => { };
   };
 }
 

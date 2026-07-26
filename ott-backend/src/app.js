@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 
 const movieRoutes = require("./routes/movieRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -11,6 +12,22 @@ const limiter = require("./middlewares/rateLimiter");
 const morgan = require("morgan");
 
 const app = express();
+
+// Домены, которым разрешено обращаться к backend.
+const allowedOrigins = (
+    process.env.CLIENT_ORIGINS || "http://localhost:5173"
+)
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+app.use(
+    cors({
+        origin: allowedOrigins,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
+);
 
 app.use(morgan("dev"));
 app.use(limiter);
