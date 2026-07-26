@@ -1,24 +1,29 @@
 import { Link, useLocation } from "react-router";
+import { Play } from "lucide-react";
 import { createMovieDetailState } from "../../utils/movieNavigation";
 import { getPreviewVideoUrl } from "../../utils/previewVideo";
 import { MovieMetadata } from "./MovieMetadata";
 import { PosterImage } from "./PosterImage";
-import { PreviewPlayButton } from "./PreviewPlayButton";
 
 export function MovieCard({ movie, className = "" }) {
   const location = useLocation();
   const detailState = createMovieDetailState(location);
-  const hasPreview = Boolean(getPreviewVideoUrl(movie.previewVideoUrl));
+  const hasVideo = Boolean(getPreviewVideoUrl(movie.previewVideoUrl));
 
   return (
     <article
       className={[
         "group relative min-w-0 rounded-lg border border-border/75 bg-surface/65 shadow-card",
-        "transition-[background-color,border-color,box-shadow,transform] duration-[220ms] ease-out hover:-translate-y-1 hover:border-border-strong hover:bg-surface-raised/80 hover:shadow-panel",
+        "transition-[background-color,border-color,box-shadow,transform] duration-[180ms] ease-out hover:-translate-y-0.5 hover:border-border-strong hover:bg-surface-raised/80 hover:shadow-panel",
         className,
       ].join(" ")}
     >
-      <div className="p-2 pb-3">
+      <Link
+        to={`/movies/${movie.id}`}
+        state={detailState}
+        className="block rounded-lg p-2 pb-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        aria-label={`View ${movie.title}`}
+      >
         <div className="relative">
           <PosterImage
             src={movie.poster}
@@ -29,13 +34,25 @@ export function MovieCard({ movie, className = "" }) {
             className="rounded-md border-border/80 transition-colors duration-[140ms] ease-out group-hover:border-primary/45"
             imageClassName="motion-zoom transition-transform duration-[480ms] ease-out group-hover:scale-[1.035]"
           />
-          {hasPreview ? (
-            <span
-              className="pointer-events-none absolute inset-0 rounded-md bg-black/35 transition-colors duration-[140ms] ease-out md:bg-transparent md:group-hover:bg-black/58 md:group-focus-within:bg-black/58"
-              aria-hidden="true"
-            />
+          {hasVideo ? (
+            <>
+              <span
+                className="pointer-events-none absolute inset-0 rounded-md bg-black/30 transition-colors duration-[140ms] ease-out md:bg-transparent md:group-hover:bg-black/58 md:group-focus-within:bg-black/58"
+                aria-hidden="true"
+              />
+              <span
+                className="pointer-events-none absolute inset-0 grid place-items-center opacity-100 transition-opacity duration-[140ms] ease-out md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+                aria-hidden="true"
+              >
+                <span className="grid size-12 place-items-center rounded-full border border-white/65 bg-black/72 text-white sm:size-14">
+                  <Play
+                    className="ml-0.5 size-5 fill-current sm:size-6"
+                    aria-hidden="true"
+                  />
+                </span>
+              </span>
+            </>
           ) : null}
-          <PreviewPlayButton movie={movie} placement="card" />
         </div>
         <div className="px-1.5 pb-0.5 pt-3">
           <h2 className="line-clamp-2 text-base font-semibold leading-snug text-text sm:text-[1.05rem]">
@@ -45,22 +62,7 @@ export function MovieCard({ movie, className = "" }) {
             <MovieMetadata movie={movie} compact />
           </div>
         </div>
-      </div>
-      <Link
-        to={`/movies/${movie.id}`}
-        state={detailState}
-        className="absolute inset-0 z-10 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        aria-label={`View details for ${movie.title}`}
-        onKeyDown={(event) => {
-          if (
-            (event.key === " " || event.key === "Enter") &&
-            !event.repeat
-          ) {
-            event.preventDefault();
-            event.currentTarget.click();
-          }
-        }}
-      />
+      </Link>
     </article>
   );
 }

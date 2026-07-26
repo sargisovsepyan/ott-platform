@@ -5,8 +5,7 @@ import { getAllMovies, getMovie } from "../../api/moviesApi";
 import { ErrorState } from "../../components/feedback/ErrorState";
 import { Skeleton } from "../../components/feedback/Skeleton";
 import { PageContainer } from "../../components/layout/PageContainer";
-import { MovieMetadata } from "../../components/movies/MovieMetadata";
-import { PreviewPlayButton } from "../../components/movies/PreviewPlayButton";
+import { MoviePlayer } from "../../components/movies/MoviePlayer";
 import { MovieRow } from "../../components/movies/MovieRow";
 import { PosterImage } from "../../components/movies/PosterImage";
 import { buttonClassName } from "../../components/ui/buttonStyles";
@@ -132,14 +131,19 @@ export function MovieDetailsPage() {
   if (displayStatus === "loading") {
     return (
       <PageContainer className="details-page page-section">
-        <div className="panel-surface grid gap-8 rounded-lg p-5 sm:p-8 md:grid-cols-[minmax(240px,0.38fr)_1fr] lg:gap-14 lg:p-10">
-          <Skeleton className="aspect-[2/3] w-full max-w-sm" />
-          <div className="pt-4">
+        <div className="panel-surface grid gap-8 rounded-lg p-5 sm:p-8 md:grid-cols-[minmax(220px,260px)_minmax(0,1fr)] lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)] lg:gap-14 lg:p-10">
+          <Skeleton className="mx-auto aspect-[2/3] w-full max-w-80 md:mx-0" />
+          <div className="md:py-2">
             <Skeleton className="h-4 w-28" />
             <Skeleton className="mt-5 h-12 w-4/5" />
-            <Skeleton className="mt-5 h-5 w-56" />
-            <Skeleton className="mt-8 h-28 w-full" />
+            <Skeleton className="mt-8 h-32 w-full max-w-xl" />
+            <Skeleton className="mt-8 h-7 w-24" />
+            <Skeleton className="mt-5 h-24 w-full" />
           </div>
+        </div>
+        <div className="mx-auto mt-10 w-full max-w-5xl sm:mt-12">
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="mt-5 aspect-video w-full" />
         </div>
       </PageContainer>
     );
@@ -184,58 +188,116 @@ export function MovieDetailsPage() {
           <ArrowLeft className="size-4" aria-hidden="true" />
           {returnOrigin.label}
         </Link>
-        <article className="panel-surface mt-5 grid gap-8 overflow-hidden rounded-lg p-5 sm:p-8 md:grid-cols-[minmax(240px,0.34fr)_1fr] lg:gap-14 lg:p-10">
-          <div className="mx-auto w-full max-w-sm md:mx-0">
-            <PosterImage
-              src={movie.poster}
-              version={movie.updatedAt}
-              title={movie.title}
-              year={movie.year}
-              loading="eager"
-              sizes="(min-width: 768px) 32vw, 80vw"
-              className="w-full rounded-lg border-border-strong/80 shadow-panel"
-            />
-          </div>
-          <div className="self-center md:py-5">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className="page-eyebrow">Lumio feature</p>
-                <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight tracking-[-0.035em] sm:text-5xl lg:text-6xl">
-                  {movie.title}
-                </h1>
+        <article className="panel-surface mt-5 overflow-hidden rounded-lg p-5 sm:p-8 lg:p-10">
+          <div className="grid gap-8 md:grid-cols-[minmax(220px,260px)_minmax(0,1fr)] md:items-start lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)] lg:gap-14">
+            <div className="mx-auto w-full max-w-80 md:mx-0">
+              <PosterImage
+                src={movie.poster}
+                version={movie.updatedAt}
+                title={movie.title}
+                year={movie.year}
+                loading="eager"
+                sizes="(min-width: 1024px) 320px, (min-width: 768px) 260px, 80vw"
+                className="w-full rounded-lg border-border-strong/80 shadow-panel"
+              />
+            </div>
+            <div className="min-w-0 md:py-2">
+              <div className="flex items-start justify-between gap-5">
+                <div className="min-w-0">
+                  <p className="page-eyebrow">Lumio feature</p>
+                  <h1 className="mt-3 text-balance text-4xl font-semibold leading-tight tracking-[-0.035em] sm:text-5xl lg:text-6xl">
+                    {movie.title}
+                  </h1>
+                </div>
+                {isAdmin ? (
+                  <div className="hidden shrink-0 md:block">
+                    <Link
+                      to={`/admin/movies/${movie.id}/edit`}
+                      className={buttonClassName("secondary")}
+                    >
+                      <Pencil className="size-4" aria-hidden="true" />
+                      Edit movie
+                    </Link>
+                  </div>
+                ) : null}
               </div>
+
+              <dl
+                className="mt-7 max-w-xl border-y border-border/70"
+                aria-label="Movie information"
+              >
+                {movie.genre ? (
+                  <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-4 border-b border-border/60 py-3">
+                    <dt className="text-sm font-medium text-text-subtle">
+                      Genre
+                    </dt>
+                    <dd className="min-w-0 text-sm font-semibold text-text">
+                      {movie.genre}
+                    </dd>
+                  </div>
+                ) : null}
+                {movie.year ? (
+                  <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-4 border-b border-border/60 py-3">
+                    <dt className="text-sm font-medium text-text-subtle">
+                      Year
+                    </dt>
+                    <dd className="text-sm font-semibold tabular-nums text-text">
+                      {movie.year}
+                    </dd>
+                  </div>
+                ) : null}
+                <div className="grid grid-cols-[5rem_minmax(0,1fr)] gap-4 py-3">
+                  <dt className="text-sm font-medium text-text-subtle">
+                    Rating
+                  </dt>
+                  <dd className="text-sm font-semibold tabular-nums text-text">
+                    {movie.rating.toFixed(1)} / 10
+                  </dd>
+                </div>
+              </dl>
+
               {isAdmin ? (
-                <Link
-                  to={`/admin/movies/${movie.id}/edit`}
-                  className={buttonClassName("secondary")}
-                >
-                  <Pencil className="size-4" aria-hidden="true" />
-                  Edit movie
-                </Link>
+                <div className="mt-6 md:hidden">
+                  <Link
+                    to={`/admin/movies/${movie.id}/edit`}
+                    className={buttonClassName("secondary")}
+                  >
+                    <Pencil className="size-4" aria-hidden="true" />
+                    Edit movie
+                  </Link>
+                </div>
               ) : null}
+
+              <section
+                className="mt-8 max-w-3xl"
+                aria-labelledby="description-heading"
+              >
+                <h2 id="description-heading" className="text-2xl font-semibold">
+                  About
+                </h2>
+                <p className="mt-4 break-words text-base leading-relaxed text-text-muted sm:text-lg">
+                  {movie.description || "No description available."}
+                </p>
+              </section>
             </div>
-            <div className="mt-5 max-w-lg">
-              <MovieMetadata movie={movie} />
-            </div>
-            <div className="mt-7">
-              <PreviewPlayButton movie={movie} variant="primary" />
-            </div>
-            <section
-              className="mt-9 max-w-3xl border-t border-border/70 pt-8"
-              aria-labelledby="description-heading"
-            >
-              <h2 id="description-heading" className="text-2xl font-semibold">
-                About
-              </h2>
-              <p className="mt-4 text-lg leading-relaxed text-text-muted">
-                {movie.description || "No description available."}
-              </p>
-            </section>
           </div>
         </article>
+
+        <section
+          className="mx-auto mt-10 w-full max-w-5xl sm:mt-12"
+          aria-labelledby="watch-heading"
+        >
+          <h2
+            id="watch-heading"
+            className="text-2xl font-semibold tracking-[-0.015em] sm:text-3xl"
+          >
+            Watch movie
+          </h2>
+          <MoviePlayer movie={movie} className="mt-5" />
+        </section>
       </PageContainer>
       {relatedMovies.length ? (
-        <div className="mt-14 sm:mt-16">
+        <div className="mt-12 sm:mt-14">
           <MovieRow
             eyebrow="Continue discovering"
             title="More like this"

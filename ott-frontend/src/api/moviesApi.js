@@ -187,7 +187,7 @@ export async function updateMoviePreviewVideo(id, file, { signal } = {}) {
 
   if (!movie) {
     throw new ApiError({
-      message: "The updated preview response was incomplete.",
+      message: "The updated movie video response was incomplete.",
     });
   }
 
@@ -206,7 +206,7 @@ export async function deleteMoviePreviewVideo(id, { signal } = {}) {
 
   if (!movie) {
     throw new ApiError({
-      message: "The updated preview response was incomplete.",
+      message: "The updated movie video response was incomplete.",
     });
   }
 

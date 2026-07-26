@@ -64,7 +64,7 @@ export function CreateMoviePage() {
         );
         finishCreation(
           updatedMovie,
-          `${updatedMovie.title} and its preview were added to the catalogue.`,
+          `${updatedMovie.title} and its video were added to the catalogue.`,
         );
       } catch (error) {
         setCreatedMovie(movie);
@@ -91,7 +91,7 @@ export function CreateMoviePage() {
       );
       finishCreation(
         updatedMovie,
-        `${updatedMovie.title} and its preview were added to the catalogue.`,
+        `${updatedMovie.title} and its video were added to the catalogue.`,
       );
     } catch (error) {
       setPreviewUploadError(getRequestMessage(error));
@@ -109,18 +109,18 @@ export function CreateMoviePage() {
         </h1>
         <p className="mt-4 max-w-2xl text-text-muted">
           Shape a complete catalogue entry with clear metadata, a portrait
-          poster, and an optional preview video.
+          poster, and an optional movie video.
         </p>
       </header>
       {createdMovie ? (
         <section className="panel-surface mt-8 rounded-lg p-5 sm:p-7 lg:p-8">
-          <Alert tone="warning" title="Movie created; preview upload incomplete">
+          <Alert tone="warning" title="Movie created; video upload incomplete">
             {createdMovie.title} is already in the catalogue, but its selected
-            preview could not be uploaded. Retrying will update that movie and
+            video could not be uploaded. Retrying will update that movie and
             will not create a duplicate.
           </Alert>
           <div className="mt-6 rounded-md border border-border/80 bg-background-elevated/60 p-4">
-            <p className="text-sm font-semibold text-text">Selected preview</p>
+            <p className="text-sm font-semibold text-text">Selected video</p>
             <p className="mt-2 break-all text-sm text-text-muted">
               {previewVideo?.name}
             </p>
@@ -139,7 +139,7 @@ export function CreateMoviePage() {
               isLoading={isRetryingPreview}
               disabled={!previewVideo || isRetryingPreview}
             >
-              Retry preview upload
+              Retry video upload
             </Button>
             <Link
               to={`/admin/movies/${createdMovie.id}/edit`}
@@ -150,11 +150,11 @@ export function CreateMoviePage() {
             <Link
               to="/admin/movies"
               state={{
-                message: `${createdMovie.title} was added without a custom preview.`,
+                message: `${createdMovie.title} was added without an uploaded video.`,
               }}
               className={buttonClassName("ghost")}
             >
-              Finish without custom preview
+              Finish without uploaded video
             </Link>
           </div>
         </section>

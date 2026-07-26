@@ -5,7 +5,7 @@ import {
   getPreviewVideoUrl,
   validatePreviewVideoFile,
 } from "../../utils/previewVideo";
-import { PreviewPlayButton } from "../movies/PreviewPlayButton";
+import { MoviePlayer } from "../movies/MoviePlayer";
 import { Button } from "../ui/Button";
 
 export function PreviewVideoUpload({
@@ -20,7 +20,8 @@ export function PreviewVideoUpload({
   const inputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [localError, setLocalError] = useState("");
-  const currentPreviewVideoUrl = getPreviewVideoUrl(movie?.previewVideoUrl);
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const currentVideoUrl = getPreviewVideoUrl(movie?.previewVideoUrl);
 
   const setFile = (file) => {
     if (disabled) {
@@ -58,7 +59,7 @@ export function PreviewVideoUpload({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 id={`${inputId}-heading`} className="text-xl font-semibold">
-            Preview video{" "}
+            Movie video{" "}
             {optional ? (
               <span className="text-sm font-normal text-text-subtle">
                 (optional)
@@ -81,7 +82,7 @@ export function PreviewVideoUpload({
           ) : (
             <FileVideo className="size-4" aria-hidden="true" />
           )}
-          {selectedFile ? "Replace file" : "Choose MP4"}
+          {selectedFile ? "Choose another video" : "Choose video"}
         </Button>
       </div>
 
@@ -97,24 +98,36 @@ export function PreviewVideoUpload({
       />
 
       {movie ? (
-        currentPreviewVideoUrl ? (
-          <div className="mt-5 flex flex-col gap-4 rounded-md border border-border/80 bg-surface/55 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex min-w-0 items-center gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-md border border-primary/35 bg-primary-soft text-primary-hover">
-                <FileVideo className="size-5" aria-hidden="true" />
-              </span>
-              <div className="min-w-0">
-                <p className="font-semibold">Current preview</p>
-                <p className="mt-1 text-sm text-text-muted">
-                  Supplied by the movie API.
-                </p>
+        currentVideoUrl ? (
+          <div className="mt-5 rounded-md border border-border/80 bg-surface/55 p-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="grid size-11 shrink-0 place-items-center rounded-md border border-primary/35 bg-primary-soft text-primary-hover">
+                  <FileVideo className="size-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <p className="font-semibold">Current video</p>
+                  <p className="mt-1 text-sm text-text-muted">
+                    Ready to play with sound.
+                  </p>
+                </div>
               </div>
+              <Button
+                variant="secondary"
+                className="w-full shrink-0 sm:w-auto"
+                disabled={disabled}
+                aria-expanded={isPlayerOpen}
+                aria-controls={`${inputId}-current-player`}
+                onClick={() => setIsPlayerOpen((value) => !value)}
+              >
+                {isPlayerOpen ? "Hide video" : "Play video"}
+              </Button>
             </div>
-            <PreviewPlayButton
-              movie={movie}
-              variant="secondary"
-              className="w-full shrink-0 sm:w-auto"
-            />
+            {isPlayerOpen ? (
+              <div id={`${inputId}-current-player`} className="mt-4">
+                <MoviePlayer movie={movie} />
+              </div>
+            ) : null}
           </div>
         ) : (
           <div className="mt-5 rounded-md border border-dashed border-border-strong bg-background-elevated/45 px-4 py-6 text-center">
@@ -122,9 +135,9 @@ export function PreviewVideoUpload({
               className="mx-auto size-6 text-text-subtle"
               aria-hidden="true"
             />
-            <p className="mt-3 text-sm font-semibold">No preview URL available</p>
+            <p className="mt-3 text-sm font-semibold">No video available</p>
             <p className="mt-1 text-sm text-text-muted">
-              Public preview controls remain hidden until the API provides one.
+              A playable movie is not currently available for this title.
             </p>
           </div>
         )
@@ -152,7 +165,7 @@ export function PreviewVideoUpload({
               onClick={() => setFile(null)}
             >
               <Trash2 className="size-4" aria-hidden="true" />
-              Remove
+              Clear selection
             </Button>
           </div>
         </div>

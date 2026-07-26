@@ -45,7 +45,7 @@ export function validatePreviewVideoFile(file) {
   }
 
   if (file.size > MAX_PREVIEW_VIDEO_SIZE) {
-    return "Preview videos must be 200 MB or smaller.";
+    return "Movie videos must be 200 MB or smaller.";
   }
 
   return "";

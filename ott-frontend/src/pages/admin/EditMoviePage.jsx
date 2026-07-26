@@ -114,7 +114,7 @@ export function EditMoviePage() {
     }
 
     if (!selectedPreviewVideo) {
-      setPreviewError("Choose an MP4 preview before uploading.");
+      setPreviewError("Choose an MP4 movie video before uploading.");
       return;
     }
 
@@ -126,7 +126,7 @@ export function EditMoviePage() {
       setState({ status: "success", movie, error: "" });
       setSelectedPreviewVideo(null);
       setPreviewResetKey((value) => value + 1);
-      setSuccessMessage("The preview video was uploaded and saved.");
+      setSuccessMessage("The movie video was uploaded and saved.");
     } catch (error) {
       setPreviewError(getRequestMessage(error));
     } finally {
@@ -149,12 +149,12 @@ export function EditMoviePage() {
       setPreviewResetKey((value) => value + 1);
       setIsPreviewDeleteOpen(false);
       setSuccessMessage(
-        "The custom preview was removed. The backend-provided default is now active.",
+        "The uploaded video was removed. The default unavailable-video placeholder is now active.",
       );
     } catch (error) {
       setPreviewDeleteError(
         error.status === 400
-          ? "This movie does not have a custom preview video to remove."
+          ? "This movie does not have an uploaded video to remove."
           : getRequestMessage(error),
       );
     } finally {
@@ -200,7 +200,7 @@ export function EditMoviePage() {
           Edit {movie.title}
         </h1>
         <p className="mt-4 max-w-2xl text-text-muted">
-          Refine movie information, poster, and preview video as separate
+          Refine movie information, poster, and movie video as separate
           updates.
         </p>
       </header>
@@ -257,9 +257,8 @@ export function EditMoviePage() {
               error={previewError}
             />
             <p className="mt-5 text-xs leading-relaxed text-text-subtle">
-              The API decides whether this URL is a custom preview or the
-              global default. Remove custom preview will leave that decision to
-              the backend.
+              Removing the uploaded video will restore the default
+              unavailable-video placeholder.
             </p>
             <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-between">
               <Button
@@ -275,7 +274,7 @@ export function EditMoviePage() {
                 }
                 className="w-full sm:w-auto"
               >
-                Remove custom preview
+                Remove uploaded video
               </Button>
               <Button
                 onClick={handlePreviewSubmit}
@@ -288,8 +287,8 @@ export function EditMoviePage() {
                 className="w-full sm:w-auto"
               >
                 {getPreviewVideoUrl(movie.previewVideoUrl)
-                  ? "Replace preview"
-                  : "Upload preview"}
+                  ? "Replace video"
+                  : "Upload video"}
               </Button>
             </div>
           </section>
@@ -307,9 +306,9 @@ export function EditMoviePage() {
       </div>
       <ConfirmDialog
         isOpen={isPreviewDeleteOpen}
-        title="Remove custom preview?"
-        message={`Remove the custom preview from ${movie.title}? The backend-provided default preview will be used when available.`}
-        confirmLabel="Remove custom preview"
+        title="Remove uploaded video?"
+        message={`Remove the uploaded video from ${movie.title}? Removing the uploaded video will restore the default unavailable-video placeholder.`}
+        confirmLabel="Remove uploaded video"
         isLoading={isDeletingPreview}
         error={previewDeleteError}
         onConfirm={handlePreviewDelete}
