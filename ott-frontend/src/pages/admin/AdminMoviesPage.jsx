@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { deleteMovie, getMovies } from "../../api/moviesApi";
+import { HomepageMoviesConfig } from "../../components/admin/HomepageMoviesConfig";
 import { Alert } from "../../components/feedback/Alert";
 import { ConfirmDialog } from "../../components/feedback/ConfirmDialog";
 import { EmptyState } from "../../components/feedback/EmptyState";
@@ -203,6 +204,7 @@ export function AdminMoviesPage() {
           {location.state.message}
         </Alert>
       ) : null}
+      <HomepageMoviesConfig />
       <div className="panel-surface mt-8 rounded-lg p-4 sm:p-5">
         <AdminSearch
           key={search}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { getHomepage } from "../../api/homepageApi";
 import { getAllMovies } from "../../api/moviesApi";
 import { EmptyState } from "../../components/feedback/EmptyState";
 import { ErrorState } from "../../components/feedback/ErrorState";
@@ -71,7 +72,7 @@ function getUniqueMovies(movies) {
   );
 }
 
-function getSpotlightCandidates(movies) {
+function getCtaCandidates(movies) {
   return getUniqueMovies(movies)
     .filter(
       (movie) =>
@@ -209,6 +210,7 @@ export function HomePage() {
   const location = useLocation();
   const [state, setState] = useState({
     status: "loading",
+    homepageMovies: [],
     movies: [],
     error: "",
   });
@@ -230,10 +232,11 @@ export function HomePage() {
     () => [...catalogueMovies].sort(compareNewestMovies).slice(0, 18),
     [catalogueMovies],
   );
-  const heroMovies = useMemo(
-    () => getSpotlightCandidates(catalogueMovies),
+  const ctaMovies = useMemo(
+    () => getCtaCandidates(catalogueMovies),
     [catalogueMovies],
   );
+  const heroMovies = state.homepageMovies;
   const homeDetailState = createMovieDetailState(location, "Back to Home");
   const resolvedHeroIndex = heroMovies.length
     ? activeHeroIndex % heroMovies.length
@@ -314,10 +317,14 @@ export function HomePage() {
   useEffect(() => {
     const controller = new AbortController();
 
-    getAllMovies({ sort: "-rating" }, { signal: controller.signal })
-      .then((movies) => {
+    Promise.all([
+      getHomepage({ signal: controller.signal }),
+      getAllMovies({ sort: "-rating" }, { signal: controller.signal }),
+    ])
+      .then(([homepage, movies]) => {
         setState({
           status: "success",
+          homepageMovies: homepage.movies,
           movies,
           error: "",
         });
@@ -326,6 +333,7 @@ export function HomePage() {
         if (error.name !== "AbortError") {
           setState({
             status: "error",
+            homepageMovies: [],
             movies: [],
             error: error.message,
           });
@@ -482,7 +490,7 @@ export function HomePage() {
         />
         <GenreBrowseSection movies={catalogueMovies} />
         <MembershipPlansSection />
-        <HomeFinalCta movies={heroMovies.length ? heroMovies : topRatedMovies} />
+        <HomeFinalCta movies={ctaMovies.length ? ctaMovies : topRatedMovies} />
       </div>
     </div>
   );
