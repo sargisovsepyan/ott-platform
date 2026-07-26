@@ -15,8 +15,8 @@ const {
     getMovieById,
     updateMovie,
     updateMoviePoster,
-    updateMoviePreviewVideo,
-    deleteMoviePreviewVideo,
+    updateMovieVideo,
+    deleteMovieVideo,
     deleteMovie,
 } = require("../controllers/movieController");
 
@@ -417,10 +417,10 @@ router.patch(
 
 /**
  * @swagger
- * /api/movies/{id}/preview-video:
+ * /api/movies/{id}/video:
  *   patch:
- *     summary: Upload or replace movie preview video
- *     description: Uploads or replaces the custom preview video of a movie. Available only to administrators.
+ *     summary: Upload or replace movie video
+ *     description: Uploads or replaces the custom movie video of a movie. Available only to administrators.
  *     tags:
  *       - Movies
  *
@@ -442,23 +442,23 @@ router.patch(
  *           schema:
  *             type: object
  *             required:
- *               - previewVideo
+ *               - video
  *             properties:
- *               previewVideo:
+ *               video:
  *                 type: string
  *                 format: binary
- *                 description: MP4 preview video.
+ *                 description: MP4 movie video.
  *
  *     responses:
  *       200:
- *         description: Preview video uploaded successfully.
+ *         description: Movie video uploaded successfully.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Movie'
  *
  *       400:
- *         description: Preview video is required.
+ *         description: Movie video is required.
  *         content:
  *           application/json:
  *             schema:
@@ -493,11 +493,11 @@ router.patch(
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.patch(
-    "/:id/preview-video",
+    "/:id/video",
     authMiddleware,
     adminMiddleware,
-    uploadVideo.single("previewVideo"),
-    updateMoviePreviewVideo
+    uploadVideo.single("video"),
+    updateMovieVideo
 );
 
 
@@ -505,10 +505,10 @@ router.patch(
 
 /**
  * @swagger
- * /api/movies/{id}/preview-video:
+ * /api/movies/{id}/video:
  *   delete:
- *     summary: Delete movie preview video
- *     description: Deletes the custom preview video and restores the default preview video. Available only to administrators.
+ *     summary: Delete movie video
+ *     description: Deletes the custom movie video and restores the default movie video. Available only to administrators.
  *     tags:
  *       - Movies
  *
@@ -525,14 +525,14 @@ router.patch(
  *
  *     responses:
  *       200:
- *         description: Custom preview video deleted successfully.
+ *         description: Custom movie video deleted successfully.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Movie'
  *
  *       400:
- *         description: The movie does not have a custom preview video.
+ *         description: The movie does not have a custom movie video.
  *         content:
  *           application/json:
  *             schema:
@@ -567,10 +567,10 @@ router.patch(
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete(
-    "/:id/preview-video",
+    "/:id/video",
     authMiddleware,
     adminMiddleware,
-    deleteMoviePreviewVideo
+    deleteMovieVideo
 );
 
 /**

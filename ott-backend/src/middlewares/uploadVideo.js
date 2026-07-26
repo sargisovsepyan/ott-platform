@@ -6,7 +6,7 @@ const cloudinary = require("../config/cloudinary");
 const videoStorage = new CloudinaryStorage({
     cloudinary,
     params: {
-        folder: "ott-platform/previews",
+        folder: "ott-platform/movies",
         resource_type: "video",
         allowed_formats: ["mp4"],
     },

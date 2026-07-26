@@ -145,12 +145,12 @@ const updateMoviePoster = asyncHandler(async (req, res) => {
 });
 
 // Загружает или заменяет превью-видео фильма.
-const updateMoviePreviewVideo = asyncHandler(async (req, res) => {
+const updateMovieVideo = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
     if (!req.file) {
         return res.status(400).json({
-            message: "Preview video is required",
+            message: "Movie video is required",
         });
     }
 
@@ -172,9 +172,9 @@ const updateMoviePreviewVideo = asyncHandler(async (req, res) => {
         });
     }
 
-    const previousPublicId = movie.previewVideo?.publicId;
+    const previousPublicId = movie.video?.publicId;
 
-    movie.previewVideo = {
+    movie.video = {
         url: req.file.path,
         publicId: uploadedPublicId,
         format: "mp4",
@@ -214,7 +214,7 @@ const updateMoviePreviewVideo = asyncHandler(async (req, res) => {
 });
 
 // Удаляет индивидуальное превью-видео фильма.
-const deleteMoviePreviewVideo = asyncHandler(async (req, res) => {
+const deleteMovieVideo = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
     const movie = await Movie.findById(id);
@@ -225,25 +225,25 @@ const deleteMoviePreviewVideo = asyncHandler(async (req, res) => {
         });
     }
 
-    const previewVideoPublicId = movie.previewVideo?.publicId;
+    const videoPublicId = movie.video?.publicId;
 
-    if (!previewVideoPublicId) {
+    if (!videoPublicId) {
         return res.status(400).json({
-            message: "Movie does not have a custom preview video",
+            message: "Movie does not have a custom movie video",
         });
     }
 
-    movie.previewVideo = undefined;
+    movie.video = undefined;
 
     await movie.save();
 
     try {
-        await cloudinary.uploader.destroy(previewVideoPublicId, {
+        await cloudinary.uploader.destroy(videoPublicId, {
             resource_type: "video",
         });
     } catch (error) {
         console.error(
-            "Failed to delete preview video from Cloudinary:",
+            "Failed to delete movie video from Cloudinary:",
             error.message
         );
     }
@@ -263,16 +263,16 @@ const deleteMovie = asyncHandler(async (req, res) => {
         });
     }
 
-    const previewVideoPublicId = deletedMovie.previewVideo?.publicId;
+    const videoPublicId = deletedMovie.video?.publicId;
 
-    if (previewVideoPublicId) {
+    if (videoPublicId) {
         try {
-            await cloudinary.uploader.destroy(previewVideoPublicId, {
+            await cloudinary.uploader.destroy(videoPublicId, {
                 resource_type: "video",
             });
         } catch (error) {
             console.error(
-                "Failed to delete movie preview video:",
+                "Failed to delete movie video:",
                 error.message
             );
         }
@@ -289,7 +289,7 @@ module.exports = {
     getMovieById,
     updateMovie,
     updateMoviePoster,
-    updateMoviePreviewVideo,
-    deleteMoviePreviewVideo,
+    updateMovieVideo,
+    deleteMovieVideo,
     deleteMovie,
 };

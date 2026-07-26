@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const previewVideoSchema = new mongoose.Schema(
+const videoSchema = new mongoose.Schema(
     {
         url: {
             type: String,
@@ -68,8 +68,8 @@ const movieSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        previewVideo: {
-            type: previewVideoSchema,
+        video: {
+            type: videoSchema,
             default: undefined,
         },
     },

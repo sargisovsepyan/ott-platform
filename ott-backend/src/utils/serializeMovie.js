@@ -7,16 +7,16 @@ const serializeMovie = (movie) => {
     const movieObject =
         typeof movie.toObject === "function" ? movie.toObject() : movie;
 
-    const { previewVideo, ...publicMovieData } = movieObject;
+    const { video, ...publicMovieData } = movieObject;
 
-    const customPreviewVideoUrl = previewVideo?.url?.trim();
+    const uploadedVideoUrl = video?.url?.trim();
 
-    const defaultPreviewVideoUrl =
-        process.env.DEFAULT_PREVIEW_VIDEO_URL?.trim() || null;
+    const comingSoonVideoUrl =
+        process.env.DEFAULT_COMING_SOON_VIDEO_URL?.trim() || null;
 
     return {
         ...publicMovieData,
-        previewVideoUrl: customPreviewVideoUrl || defaultPreviewVideoUrl,
+        videoUrl: uploadedVideoUrl || comingSoonVideoUrl,
     };
 };
 
