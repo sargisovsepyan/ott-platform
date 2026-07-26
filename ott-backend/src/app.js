@@ -9,9 +9,12 @@ const errorHandler = require("./middlewares/errorHandler");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
 const limiter = require("./middlewares/rateLimiter");
+const authLimiter = require("./middlewares/authRateLimiter");
 const morgan = require("morgan");
 
 const app = express();
+
+app.set("trust proxy", 1);
 
 // Домены, которым разрешено обращаться к backend.
 const allowedOrigins = (
@@ -38,7 +41,7 @@ app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api/movies", movieRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 // Подключаем маршруты главной страницы.
 app.use("/api/homepage", homepageRoutes);
 
