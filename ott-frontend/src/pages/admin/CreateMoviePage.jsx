@@ -1,17 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import {
-  createMovie,
-  updateMoviePreviewVideo,
-} from "../../api/moviesApi";
+import { createMovie, updateMovieVideo } from "../../api/moviesApi";
 import { Alert } from "../../components/feedback/Alert";
 import { MovieForm } from "../../components/forms/MovieForm";
+import { MovieVideoUpload } from "../../components/forms/MovieVideoUpload";
 import { PosterUpload } from "../../components/forms/PosterUpload";
-import { PreviewVideoUpload } from "../../components/forms/PreviewVideoUpload";
 import { PageContainer } from "../../components/layout/PageContainer";
 import { Button } from "../../components/ui/Button";
 import { buttonClassName } from "../../components/ui/buttonStyles";
-import { formatFileSize } from "../../utils/previewVideo";
+import { formatFileSize } from "../../utils/video";
 
 function getRequestMessage(error) {
   return error.errors?.length
@@ -23,12 +20,12 @@ export function CreateMoviePage() {
   const navigate = useNavigate();
   const [poster, setPoster] = useState(null);
   const [posterError, setPosterError] = useState("");
-  const [previewVideo, setPreviewVideo] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
   const [requestError, setRequestError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createdMovie, setCreatedMovie] = useState(null);
-  const [previewUploadError, setPreviewUploadError] = useState("");
-  const [isRetryingPreview, setIsRetryingPreview] = useState(false);
+  const [videoUploadError, setVideoUploadError] = useState("");
+  const [isRetryingVideo, setIsRetryingVideo] = useState(false);
 
   const finishCreation = (movie, message) => {
     navigate("/admin/movies", {
@@ -52,23 +49,20 @@ export function CreateMoviePage() {
 
     try {
       const movie = await createMovie(formData);
-      if (!previewVideo) {
+      if (!videoFile) {
         finishCreation(movie);
         return;
       }
 
       try {
-        const updatedMovie = await updateMoviePreviewVideo(
-          movie.id,
-          previewVideo,
-        );
+        const updatedMovie = await updateMovieVideo(movie.id, videoFile);
         finishCreation(
           updatedMovie,
           `${updatedMovie.title} and its video were added to the catalogue.`,
         );
       } catch (error) {
         setCreatedMovie(movie);
-        setPreviewUploadError(getRequestMessage(error));
+        setVideoUploadError(getRequestMessage(error));
       }
     } catch (error) {
       setRequestError(getRequestMessage(error));
@@ -77,26 +71,23 @@ export function CreateMoviePage() {
     }
   };
 
-  const retryPreviewUpload = async () => {
-    if (!createdMovie || !previewVideo || isRetryingPreview) {
+  const retryVideoUpload = async () => {
+    if (!createdMovie || !videoFile || isRetryingVideo) {
       return;
     }
 
-    setIsRetryingPreview(true);
-    setPreviewUploadError("");
+    setIsRetryingVideo(true);
+    setVideoUploadError("");
     try {
-      const updatedMovie = await updateMoviePreviewVideo(
-        createdMovie.id,
-        previewVideo,
-      );
+      const updatedMovie = await updateMovieVideo(createdMovie.id, videoFile);
       finishCreation(
         updatedMovie,
         `${updatedMovie.title} and its video were added to the catalogue.`,
       );
     } catch (error) {
-      setPreviewUploadError(getRequestMessage(error));
+      setVideoUploadError(getRequestMessage(error));
     } finally {
-      setIsRetryingPreview(false);
+      setIsRetryingVideo(false);
     }
   };
 
@@ -122,22 +113,22 @@ export function CreateMoviePage() {
           <div className="mt-6 rounded-md border border-border/80 bg-background-elevated/60 p-4">
             <p className="text-sm font-semibold text-text">Selected video</p>
             <p className="mt-2 break-all text-sm text-text-muted">
-              {previewVideo?.name}
+              {videoFile?.name}
             </p>
             <p className="mt-1 text-sm text-text-subtle">
-              {formatFileSize(previewVideo?.size)}
+              {formatFileSize(videoFile?.size)}
             </p>
           </div>
-          {previewUploadError ? (
+          {videoUploadError ? (
             <p className="mt-4 text-sm text-danger" role="alert">
-              {previewUploadError}
+              {videoUploadError}
             </p>
           ) : null}
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button
-              onClick={retryPreviewUpload}
-              isLoading={isRetryingPreview}
-              disabled={!previewVideo || isRetryingPreview}
+              onClick={retryVideoUpload}
+              isLoading={isRetryingVideo}
+              disabled={!videoFile || isRetryingVideo}
             >
               Retry video upload
             </Button>
@@ -177,10 +168,10 @@ export function CreateMoviePage() {
                 error={posterError}
               />
               <div className="border-t border-border/75 pt-7">
-                <PreviewVideoUpload
+                <MovieVideoUpload
                   optional
                   disabled={isSubmitting}
-                  onFileChange={setPreviewVideo}
+                  onFileChange={setVideoFile}
                 />
               </div>
             </div>

@@ -2,13 +2,13 @@ import { useId, useRef, useState } from "react";
 import { FileVideo, Replace, Trash2 } from "lucide-react";
 import {
   formatFileSize,
-  getPreviewVideoUrl,
-  validatePreviewVideoFile,
-} from "../../utils/previewVideo";
+  getVideoUrl,
+  validateVideoFile,
+} from "../../utils/video";
 import { MoviePlayer } from "../movies/MoviePlayer";
 import { Button } from "../ui/Button";
 
-export function PreviewVideoUpload({
+export function MovieVideoUpload({
   movie,
   optional = false,
   onFileChange,
@@ -21,7 +21,7 @@ export function PreviewVideoUpload({
   const [selectedFile, setSelectedFile] = useState(null);
   const [localError, setLocalError] = useState("");
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
-  const currentVideoUrl = getPreviewVideoUrl(movie?.previewVideoUrl);
+  const currentVideoUrl = getVideoUrl(movie?.videoUrl);
 
   const setFile = (file) => {
     if (disabled) {
@@ -38,7 +38,7 @@ export function PreviewVideoUpload({
       return;
     }
 
-    const validationMessage = validatePreviewVideoFile(file);
+    const validationMessage = validateVideoFile(file);
     if (validationMessage) {
       setSelectedFile(null);
       setLocalError(validationMessage);

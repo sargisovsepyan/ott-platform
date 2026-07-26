@@ -2,24 +2,24 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import {
-  deleteMoviePreviewVideo,
+  deleteMovieVideo,
   getMovie,
   updateMovie,
+  updateMovieVideo,
   updateMoviePoster,
-  updateMoviePreviewVideo,
 } from "../../api/moviesApi";
 import { ConfirmDialog } from "../../components/feedback/ConfirmDialog";
 import { ErrorState } from "../../components/feedback/ErrorState";
 import { Skeleton } from "../../components/feedback/Skeleton";
 import { Alert } from "../../components/feedback/Alert";
 import { MovieForm } from "../../components/forms/MovieForm";
+import { MovieVideoUpload } from "../../components/forms/MovieVideoUpload";
 import { PosterUpload } from "../../components/forms/PosterUpload";
-import { PreviewVideoUpload } from "../../components/forms/PreviewVideoUpload";
 import { PageContainer } from "../../components/layout/PageContainer";
 import { Button } from "../../components/ui/Button";
 import { buttonClassName } from "../../components/ui/buttonStyles";
 import { createMovieDetailState } from "../../utils/movieNavigation";
-import { getPreviewVideoUrl } from "../../utils/previewVideo";
+import { getVideoUrl } from "../../utils/video";
 
 function getRequestMessage(error) {
   return error.errors?.length
@@ -38,18 +38,18 @@ export function EditMoviePage() {
   });
   const [metadataError, setMetadataError] = useState("");
   const [posterError, setPosterError] = useState("");
-  const [previewError, setPreviewError] = useState("");
-  const [previewDeleteError, setPreviewDeleteError] = useState("");
+  const [videoError, setVideoError] = useState("");
+  const [videoDeleteError, setVideoDeleteError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedPoster, setSelectedPoster] = useState(null);
-  const [selectedPreviewVideo, setSelectedPreviewVideo] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(null);
   const [isSavingMetadata, setIsSavingMetadata] = useState(false);
   const [isSavingPoster, setIsSavingPoster] = useState(false);
-  const [isSavingPreview, setIsSavingPreview] = useState(false);
-  const [isDeletingPreview, setIsDeletingPreview] = useState(false);
-  const [isPreviewDeleteOpen, setIsPreviewDeleteOpen] = useState(false);
+  const [isSavingVideo, setIsSavingVideo] = useState(false);
+  const [isDeletingVideo, setIsDeletingVideo] = useState(false);
+  const [isVideoDeleteOpen, setIsVideoDeleteOpen] = useState(false);
   const [posterResetKey, setPosterResetKey] = useState(0);
-  const [previewResetKey, setPreviewResetKey] = useState(0);
+  const [videoResetKey, setVideoResetKey] = useState(0);
   const retry = useCallback(() => setRequestKey((value) => value + 1), []);
 
   useEffect(() => {
@@ -108,57 +108,57 @@ export function EditMoviePage() {
     }
   };
 
-  const handlePreviewSubmit = async () => {
-    if (isSavingPreview || isDeletingPreview) {
+  const handleVideoSubmit = async () => {
+    if (isSavingVideo || isDeletingVideo) {
       return;
     }
 
-    if (!selectedPreviewVideo) {
-      setPreviewError("Choose an MP4 movie video before uploading.");
+    if (!selectedVideo) {
+      setVideoError("Choose an MP4 movie video before uploading.");
       return;
     }
 
-    setIsSavingPreview(true);
-    setPreviewError("");
+    setIsSavingVideo(true);
+    setVideoError("");
     setSuccessMessage("");
     try {
-      const movie = await updateMoviePreviewVideo(id, selectedPreviewVideo);
+      const movie = await updateMovieVideo(id, selectedVideo);
       setState({ status: "success", movie, error: "" });
-      setSelectedPreviewVideo(null);
-      setPreviewResetKey((value) => value + 1);
+      setSelectedVideo(null);
+      setVideoResetKey((value) => value + 1);
       setSuccessMessage("The movie video was uploaded and saved.");
     } catch (error) {
-      setPreviewError(getRequestMessage(error));
+      setVideoError(getRequestMessage(error));
     } finally {
-      setIsSavingPreview(false);
+      setIsSavingVideo(false);
     }
   };
 
-  const handlePreviewDelete = async () => {
-    if (isDeletingPreview || isSavingPreview) {
+  const handleVideoDelete = async () => {
+    if (isDeletingVideo || isSavingVideo) {
       return;
     }
 
-    setIsDeletingPreview(true);
-    setPreviewDeleteError("");
+    setIsDeletingVideo(true);
+    setVideoDeleteError("");
     setSuccessMessage("");
     try {
-      const movie = await deleteMoviePreviewVideo(id);
+      const movie = await deleteMovieVideo(id);
       setState({ status: "success", movie, error: "" });
-      setSelectedPreviewVideo(null);
-      setPreviewResetKey((value) => value + 1);
-      setIsPreviewDeleteOpen(false);
+      setSelectedVideo(null);
+      setVideoResetKey((value) => value + 1);
+      setIsVideoDeleteOpen(false);
       setSuccessMessage(
-        "The uploaded video was removed. The default unavailable-video placeholder is now active.",
+        "The uploaded video was removed. The default Coming Soon video is now active.",
       );
     } catch (error) {
-      setPreviewDeleteError(
+      setVideoDeleteError(
         error.status === 400
           ? "This movie does not have an uploaded video to remove."
           : getRequestMessage(error),
       );
     } finally {
-      setIsDeletingPreview(false);
+      setIsDeletingVideo(false);
     }
   };
 
@@ -246,47 +246,47 @@ export function EditMoviePage() {
             </div>
           </section>
           <section className="panel-surface rounded-lg p-5 sm:p-6">
-            <PreviewVideoUpload
-              key={previewResetKey}
+            <MovieVideoUpload
+              key={videoResetKey}
               movie={movie}
-              disabled={isSavingPreview || isDeletingPreview}
+              disabled={isSavingVideo || isDeletingVideo}
               onFileChange={(file) => {
-                setSelectedPreviewVideo(file);
-                setPreviewError("");
+                setSelectedVideo(file);
+                setVideoError("");
               }}
-              error={previewError}
+              error={videoError}
             />
             <p className="mt-5 text-xs leading-relaxed text-text-subtle">
-              Removing the uploaded video will restore the default
-              unavailable-video placeholder.
+              Removing the uploaded video will restore the default Coming Soon
+              video.
             </p>
             <div className="mt-6 flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-between">
               <Button
                 variant="danger"
                 onClick={() => {
-                  setPreviewDeleteError("");
-                  setIsPreviewDeleteOpen(true);
+                  setVideoDeleteError("");
+                  setIsVideoDeleteOpen(true);
                 }}
                 disabled={
-                  !getPreviewVideoUrl(movie.previewVideoUrl) ||
-                  isSavingPreview ||
-                  isDeletingPreview
+                  !getVideoUrl(movie.videoUrl) ||
+                  isSavingVideo ||
+                  isDeletingVideo
                 }
                 className="w-full sm:w-auto"
               >
                 Remove uploaded video
               </Button>
               <Button
-                onClick={handlePreviewSubmit}
-                isLoading={isSavingPreview}
+                onClick={handleVideoSubmit}
+                isLoading={isSavingVideo}
                 disabled={
-                  !selectedPreviewVideo ||
-                  isSavingPreview ||
-                  isDeletingPreview
+                  !selectedVideo ||
+                  isSavingVideo ||
+                  isDeletingVideo
                 }
                 className="w-full sm:w-auto"
               >
-                {getPreviewVideoUrl(movie.previewVideoUrl)
+                {getVideoUrl(movie.videoUrl)
                   ? "Replace video"
                   : "Upload video"}
               </Button>
@@ -305,17 +305,17 @@ export function EditMoviePage() {
         </Link>
       </div>
       <ConfirmDialog
-        isOpen={isPreviewDeleteOpen}
+        isOpen={isVideoDeleteOpen}
         title="Remove uploaded video?"
-        message={`Remove the uploaded video from ${movie.title}? Removing the uploaded video will restore the default unavailable-video placeholder.`}
+        message={`Remove the uploaded video from ${movie.title}? Removing the uploaded video will restore the default Coming Soon video.`}
         confirmLabel="Remove uploaded video"
-        isLoading={isDeletingPreview}
-        error={previewDeleteError}
-        onConfirm={handlePreviewDelete}
+        isLoading={isDeletingVideo}
+        error={videoDeleteError}
+        onConfirm={handleVideoDelete}
         onClose={() => {
-          if (!isDeletingPreview) {
-            setIsPreviewDeleteOpen(false);
-            setPreviewDeleteError("");
+          if (!isDeletingVideo) {
+            setIsVideoDeleteOpen(false);
+            setVideoDeleteError("");
           }
         }}
       />

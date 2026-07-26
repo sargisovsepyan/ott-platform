@@ -1,14 +1,14 @@
 import { Link, useLocation } from "react-router";
 import { Play } from "lucide-react";
 import { createMovieDetailState } from "../../utils/movieNavigation";
-import { getPreviewVideoUrl } from "../../utils/previewVideo";
+import { getVideoUrl } from "../../utils/video";
 import { MovieMetadata } from "./MovieMetadata";
 import { PosterImage } from "./PosterImage";
 
 export function MovieCard({ movie, className = "" }) {
   const location = useLocation();
   const detailState = createMovieDetailState(location);
-  const hasVideo = Boolean(getPreviewVideoUrl(movie.previewVideoUrl));
+  const hasVideo = Boolean(getVideoUrl(movie.videoUrl));
 
   return (
     <article

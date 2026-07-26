@@ -5,7 +5,7 @@ import {
   Play,
   RotateCcw,
 } from "lucide-react";
-import { getPreviewVideoUrl } from "../../utils/previewVideo";
+import { getVideoUrl } from "../../utils/video";
 import { Button } from "../ui/Button";
 
 function stopVideo(video) {
@@ -24,7 +24,7 @@ function stopVideo(video) {
 export function MoviePlayer({ movie, className = "" }) {
   const videoRef = useRef(null);
   const attemptedSourceRef = useRef("");
-  const source = getPreviewVideoUrl(movie?.previewVideoUrl);
+  const source = getVideoUrl(movie?.videoUrl);
   const title = movie?.title?.trim() || "Movie";
   const [playback, setPlayback] = useState({
     source,

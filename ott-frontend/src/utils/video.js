@@ -1,6 +1,6 @@
-export const MAX_PREVIEW_VIDEO_SIZE = 200 * 1024 * 1024;
+export const MAX_MOVIE_VIDEO_SIZE = 200 * 1024 * 1024;
 
-export function getPreviewVideoUrl(value) {
+export function getVideoUrl(value) {
   if (typeof value !== "string" || !value.trim()) {
     return "";
   }
@@ -27,7 +27,7 @@ export function formatFileSize(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function validatePreviewVideoFile(file) {
+export function validateVideoFile(file) {
   if (!file) {
     return "";
   }
@@ -44,7 +44,7 @@ export function validatePreviewVideoFile(file) {
     return "The selected video file is empty or invalid.";
   }
 
-  if (file.size > MAX_PREVIEW_VIDEO_SIZE) {
+  if (file.size > MAX_MOVIE_VIDEO_SIZE) {
     return "Movie videos must be 200 MB or smaller.";
   }
 
