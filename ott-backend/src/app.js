@@ -2,6 +2,7 @@ const express = require("express");
 
 const movieRoutes = require("./routes/movieRoutes");
 const authRoutes = require("./routes/authRoutes");
+const homepageRoutes = require("./routes/homepageRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./config/swagger");
@@ -20,6 +21,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api/movies", movieRoutes);
 app.use("/api/auth", authRoutes);
+// Подключаем маршруты главной страницы.
+app.use("/api/homepage", homepageRoutes);
 
 app.get("/", (req, res) => {
     return res.json({

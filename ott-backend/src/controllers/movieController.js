@@ -1,4 +1,5 @@
 const Movie = require("../models/Movie");
+const HomepageConfig = require("../models/HomepageConfig");
 const cloudinary = require("../config/cloudinary");
 const asyncHandler = require("../utils/asyncHandler");
 const serializeMovie = require("../utils/serializeMovie");
@@ -251,7 +252,7 @@ const deleteMovieVideo = asyncHandler(async (req, res) => {
     res.status(200).json(serializeMovie(movie));
 });
 
-// Удаляет фильм по ID
+// Удаляет фильм по ID.
 const deleteMovie = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
@@ -263,6 +264,43 @@ const deleteMovie = asyncHandler(async (req, res) => {
         });
     }
 
+    // Удаляем фильм из настроек главной страницы,
+    // если администратор ранее выбрал его для показа.
+    const homepageConfig = await HomepageConfig.findOne({
+        key: "main",
+    });
+
+    if (homepageConfig) {
+        const remainingMovieIds = homepageConfig.movieIds.filter(
+            (movieId) => movieId.toString() !== id
+        );
+
+        const movieWasOnHomepage =
+            remainingMovieIds.length !== homepageConfig.movieIds.length;
+
+        if (movieWasOnHomepage) {
+            // Если выбранных фильмов больше не осталось,
+            // удаляем конфигурацию и возвращаем стандартный список фильмов.
+            if (remainingMovieIds.length === 0) {
+                await HomepageConfig.deleteOne({
+                    _id: homepageConfig._id,
+                });
+            } else {
+                homepageConfig.movieIds = remainingMovieIds;
+
+                // Количество отображаемых фильмов не может быть
+                // больше количества оставшихся выбранных фильмов.
+                homepageConfig.displayCount = Math.min(
+                    homepageConfig.displayCount,
+                    remainingMovieIds.length
+                );
+
+                await homepageConfig.save();
+            }
+        }
+    }
+
+    // Удаляем загруженное видео фильма из Cloudinary.
     const videoPublicId = deletedMovie.video?.publicId;
 
     if (videoPublicId) {
@@ -278,7 +316,7 @@ const deleteMovie = asyncHandler(async (req, res) => {
         }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
         message: "Movie deleted successfully",
     });
 });
