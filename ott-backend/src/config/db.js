@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 // Функция подключения к базе данных.
 const connectDB = async () => {
+
+    const mongoUri = process.env.MONGO_URI;
+    if (!mongoUri) {
+        throw new Error("MONGO_URI is not defined");
+    }
+
     try {
         await mongoose.connect(process.env.MONGO_URI);
 

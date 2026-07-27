@@ -1,7 +1,7 @@
 {
     "name": "ott-backend",
     "version": "1.0.0",
-    "description": "",
+    "description": "REST API for the Lumio OTT streaming platform",
     "main": "src/server.js",
     "scripts": {
         "dev": "nodemon src/server.js",
@@ -9,7 +9,7 @@
         "lint": "eslint src"
     },
     "keywords": [],
-    "author": "",
+    "author": "Sargis Hovsepyan",
     "license": "ISC",
     "type": "commonjs",
     "dependencies": {
